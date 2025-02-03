@@ -1,0 +1,252 @@
+{% extends "myApp/base.html" %}
+
+{% block title %}Home - SS ENTERPRISES{% endblock %}
+
+{% block content %}
+{% load static %}
+    <div class="profile-container">
+        <h1>User Profile</h1>
+        
+        <!-- Profile Information -->
+        <section class="profile-info">
+            <h2>Personal Information</h2>
+            <div class="info">
+                <label>Name:</label>
+                <p id="user-name">{{ user.username }}</p>
+            </div>
+            <div class="info">
+                <label>Email:</label>
+                <p id="user-email">{{ user.email }}</p>
+            </div>
+            <div class="info">
+                <label>Phone Number:</label>
+                <p id="user-phone">{{ user.phone }}</p> <!-- Assuming phone number is stored in a related Profile model -->
+            </div>
+            <div class="edit-profile">
+                <button onclick="toggleEdit()">Edit Profile</button>
+            </div>
+        </section>
+        
+        <!-- Appointment History -->
+        <section class="appointments">
+            <h2>Appointment History</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Salon</th>
+                        <th>Service</th>
+                        <th>Date</th>
+                        <th>Feedback</th>
+                        <th>Rebook</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in appointments %}
+                    <tr>
+                        <td>{{ appointment.salon.name }}</td>
+                        <td>{{ appointment.service }}</td>
+                        <td>{{ appointment.date }}</td>
+                        <td>
+                            <a href="{% url 'give_feedback' appointment.id %}" class="btn btn-feedback">Give Feedback</a>
+                        </td>
+                        <td>
+                            <a href="{% url 'book_appointment' appointment.salon.id appointment.service.id %}" class="btn btn-rebook">
+                                Rebook</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No appointments found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Edit Profile Form -->
+        <section class="edit-form" id="edit-form" style="display: none;">
+            <h2>Edit Profile</h2>
+            <form method="post" action="{% url 'edit_profile' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="edit-name">Name:</label>
+                    <input type="text" id="edit-name" name="username" value="{{ user.username }}">
+                </div>
+                <div class="form-group">
+                    <label for="edit-email">Email:</label>
+                    <input type="email" id="edit-email" name="email" value="{{ user.email }}">
+                </div>
+                <div class="form-group">
+                    <label for="edit-phone">Phone Number:</label>
+                    <input type="text" id="edit-phone" name="phone_number" value="{{ user.phone }}">
+                </div>
+                <button type="submit">Save Changes</button>
+                <button type="button" onclick="toggleEdit()">Cancel</button>
+            </form>
+        </section>
+    </div>
+    
+    <script>
+        function toggleEdit() {
+            const profileInfo = document.querySelector('.profile-info');
+            const editForm = document.getElementById('edit-form');
+            
+            if (editForm.style.display === 'none') {
+                profileInfo.style.display = 'none';
+                editForm.style.display = 'block';
+            } else {
+                profileInfo.style.display = 'block';
+                editForm.style.display = 'none';
+            }
+        }
+    </script>
+
+<style>
+/* General page styling */
+
+.profile-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+h2 {
+    color: #007BFF;
+}
+
+/* Profile Information Section */
+.profile-info {
+    margin-bottom: 30px;
+}
+
+.info {
+    margin: 10px 0;
+}
+
+.info label {
+    font-weight: bold;
+    color: #333;
+}
+
+.info p {
+    color: #555;
+}
+
+/* Edit Profile Section */
+.edit-profile button {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.edit-profile button:hover {
+    background-color: #0056b3;
+}
+
+/* Appointment History Section */
+.appointments table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.appointments th, .appointments td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.appointments th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+.appointments td {
+    background-color: #f9f9f9;
+    color: #555;
+}
+
+/* Edit Profile Form */
+.edit-form {
+    margin-top: 30px;
+}
+
+.edit-form .form-group {
+    margin-bottom: 20px;
+}
+
+.edit-form .form-group label {
+    font-weight: bold;
+}
+
+.edit-form .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.edit-form button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.edit-form button:hover {
+    background-color: #218838;
+}
+
+.edit-form button[type="button"] {
+    background-color: #dc3545;
+}
+
+.edit-form button[type="button"]:hover {
+    background-color: #c82333;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 14px;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-feedback {
+    background-color: #007bff; /* Blue */
+}
+
+.btn-rebook {
+    background-color: #28a745; /* Green */
+}
+
+/* Add hover effects */
+.btn:hover {
+    opacity: 0.9;
+}
+
+</style>
+{% endblock %}

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SS ENTERPRISES</title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'signup.css' %}">
+</head>
+
+<body>
+    <div class="wrapper">
+
+        <!-- Flash Message Container -->
+        <div id="popup" class="popup"></div>
+
+        <div class="form-box register">
+            <div class="logo-title-container">
+                <!--<div class="logo">
+                    <img src="{% static 'images/logo.jpg' %}" alt="Logo">
+                </div>-->
+                <h2 class="title">Sign Up</h2>
+            </div>
+
+            <form id="signupForm" action="{% url 'register' %}" method="POST">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="error-list">
+                        {% for error in form.non_field_errors %}
+                            <p class="error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <!-- Step 1: Initial Details -->
+                <div class="form-section active" id="initial-details">
+                    <div class="input-box">
+                        <input type="text" id="first_name" name="first_name" required>
+                        <label for="first_name">First Name</label>
+                        <i class='bx bxs-user'></i>
+                        {% if form.first_name.errors %}
+                            <p class="error">{{ form.first_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="input-box">
+                        <input type="text" id="last_name" name="last_name" required>
+                        <label for="last_name">Last Name</label>
+                        <i class='bx bxs-user'></i>
+                        {% if form.last_name.errors %}
+                            <p class="error">{{ form.last_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="input-box">
+                        <input type="text" id="username" name="username" required>
+                        <label for="username">Username</label>
+                        <i class='bx bxs-user'></i>
+                        {% if form.username.errors %}
+                            <p class="error">{{ form.username.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="input-box">
+                        <input type="email" id="email" name="email" required>
+                        <label for="email">Email</label>
+                        <i class='bx bxs-envelope'></i>
+                        {% if form.email.errors %}
+                            <p class="error">{{ form.email.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="input-box">
+                        <input type="tel" id="phone" name="phone" required>
+                        <label for="phone">Phone Number</label>
+                        <i class='bx bxs-phone'></i>
+                        {% if form.phone.errors %}
+                            <p class="error">{{ form.phone.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="input-box">
+                        <input type="password" id="password" name="password" required>
+                        <label for="password">Password</label>
+                        <i class='bx bxs-lock-alt' id="toggle-password"></i>
+                        {% if form.password.errors %}
+                            <p class="error">{{ form.password.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="input-box">
+                        <input type="password" id="confirm-password" name="confirm_password" required>
+                        <label for="confirm-password">Confirm Password</label>
+                        <i class='bx bxs-lock-alt'></i>
+                        {% if form.confirm_password.errors %}
+                            <p class="error">{{ form.confirm_password.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <button type="button" class="btn" onclick="showNextSection()">Next</button>
+                </div>
+
+                <!-- Step 2: Additional Details -->
+                <div class="form-section" id="additional-details">
+                    <div class="input-box" style="display: flex; align-items: center; gap: 15px;">
+                        <label for="gender">Gender</label>
+                        <div style="display: flex; gap: 10px;">
+                            <div style="margin-left: 100px;">
+                                <input type="radio" id="male" name="gender" value="Male" required>
+                                <label for="male" style="margin-left: 120px;">Male</label>
+                            </div>
+                            <div style="margin-left: 100px;">
+                                <input type="radio" id="female" name="gender" value="Female" required>
+                                <label for="female" style="margin-left: 240px;">Female</label>
+                            </div>
+                            {% if form.gender.errors %}
+                                <p class="error">{{ form.gender.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="input-box">
+                        <input type="date" id="dob" name="date_of_birth">
+                        <label for="dob">Date of Birth</label>
+                        <i class='bx bxs-calendar'></i>
+                        {% if form.date_of_birth.errors %}
+                            <p class="error">{{ form.date_of_birth.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="two-column">
+                        <div class="input-box" style="margin-top: 1px;">
+                            <input type="text" id="city" name="city" required>
+                            <label for="city">City</label>
+                            <i class='bx bxs-map'></i>
+                            {% if form.city.errors %}
+                                    <p class="error">{{ form.city.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="input-box" style="margin-top: 1px;">
+                            <input type="text" id="address-line" name="address_line" required>
+                            <label for="address-line">Address Line</label>
+                            <i class='bx bxs-home'></i>
+                            {% if form.address_line.errors %}
+                                    <p class="error">{{ form.address_line.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="two-column">
+                        <div class="input-box" style="margin-top: 1px;">
+                            <input type="text" id="state" name="state" required>
+                            <label for="state">State</label>
+                            <i class='bx bxs-map'></i>
+                            {% if form.state.errors %}
+                                <p class="error">{{ form.state.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="input-box" style="margin-top: 1px;">
+                            <input type="text" id="pincode" name="pincode" required>
+                            <label for="pincode">Pincode</label>
+                            <i class='bx bxs-map'></i>
+                            {% if form.pincode.errors %}
+                                <p class="error">{{ form.pincode.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="input-box" style="margin-top: 1px;">
+                        <input type="text" id="country" name="country" required>
+                        <label for="country">Country</label>
+                        <i class='bx bxs-flag'></i>
+                        {% if form.country.errors %}
+                            <p class="error">{{ form.country.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="button-container">
+                        <button type="button" class="btn" onclick="showPreviousSection()">Back</button>
+                        <button type="submit" class="btn">Sign Up</button>
+                    </div>
+                </div>
+
+                <div class="linkTxt">
+                    <p>Already have an account? <a href="{% url 'login' %}" class="register-link">Login</a></p>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        function showNextSection() {
+            document.getElementById('initial-details').classList.remove('active');
+            document.getElementById('additional-details').classList.add('active');
+        }
+
+        function showPreviousSection() {
+            document.getElementById('additional-details').classList.remove('active');
+            document.getElementById('initial-details').classList.add('active');
+        }
+
+        const passwordInput = document.getElementById('password');
+        const togglePassword = document.getElementById('toggle-password');
+
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('bx-show');
+            this.classList.toggle('bx-hide');
+        });
+
+    </script>
+</body>
+</html>

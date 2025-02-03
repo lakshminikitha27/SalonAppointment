@@ -1,0 +1,147 @@
+{% extends "myApp/base.html" %}
+{% block title %}Salon Details - SS ENTERPRISES{% endblock %}
+
+{% block content %}
+{% load static %}
+<style>
+        /* Reset default styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            padding: 20px;
+        }
+        /* Salon Details Container */
+        .salon-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #e0f2fe;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+        }
+        .salon-image {
+            width: 50%;
+            margin-right: 20px;
+            border-radius: 8px;
+        }
+        .salon-details {
+            width: 50%;
+        }
+        .salon-name {
+            font-size: 1.8em;
+            color: #1e3a8a;
+        }
+        .salon-address {
+            font-size: 1em;
+            color: #555;
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .location-icon {
+            width: 50px;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        .services-container {
+            margin-top: 20px;
+        }
+        .service-image {
+            width: 150px; /* Reduced image size */
+            height: 150px; /* Maintain aspect ratio */
+            margin-right: 20px;
+            border-radius: 6px;
+        }
+        .services-header {
+            font-size: 1.5em;
+            color: #1e3a8a;
+            margin-bottom: 15px;
+        }
+        .service-item {
+            display: flex;
+            align-items: center;
+            background-color: #e0f2fe;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            transition: transform 0.3s;
+            /* Ensure it inherits or overrides unwanted global styling */
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        .service-item:hover {
+            transform: scale(1.02);
+        }
+        .service-name {
+            font-size: 1.2em;
+            color: #333;
+        }
+        .service-details {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            gap: 10px;
+        }
+        .service-price {
+            font-size: 1.1em;
+            color: #1e3a8a;
+        }
+        .service-duration {
+            font-size: 0.9em;
+            color: #555;
+        }
+        .book-appointment {
+            background-color: #1e3a8a;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9em;
+            margin-top: 10px;
+            display: inline-block;
+            width: auto;
+            max-width: 150px;
+        }
+        .book-appointment:hover {
+            background-color: #1b3366;
+        }
+</style>
+    <div class="salon-container">
+        <img src="{% static 'images/'|add:salon.image_name %}" alt="{{ salon.name }}" class="salon-image">
+        <div class="salon-details">
+            <h1 class="salon-name">{{ salon.name }}</h1>
+            <br>
+            <p class="salon-address">
+                {{ salon.address }}
+                <a href="https://www.google.com/maps/search/?api=1&query={{ salon.latitude }},{{ salon.longitude }}" target="_blank">
+                    <img src="{% static 'images/location-icon.png' %}" alt="Location" class="location-icon">
+                </a>
+            </p>
+            <p>Rating: {{ salon.rating }}</p>
+        </div>
+    </div>
+    
+    <div class="services-container">
+        <h2 class="services-header">Services Offered</h2>
+        <ul>
+            {% for service in services %}
+            <li class="service-item">
+                <img src="{% static 'images/'|add:service.image_name %}" alt="{{ service.name }}" class="service-image">
+                <div class="service-details">
+                    <h3 class="service-name">{{ service.name }} - {{ service.price }} INR</h3>
+                    <p class="service-duration">Duration: {{ service.duration }} minutes</p>
+                    <a href="{% url 'book_appointment' salon_id=salon.id service_id=service.id %}" class="book-appointment">
+                    Book Appointment</a>
+                </div>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

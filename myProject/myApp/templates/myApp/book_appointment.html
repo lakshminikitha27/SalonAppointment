@@ -1,0 +1,245 @@
+{% extends "myApp/base.html" %}
+{% block title %}Salon Details - SS ENTERPRISES{% endblock %}
+
+{% block content %}
+{% load static %}
+<style>
+    /* Body and Container Styling */
+    .book_container {
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        padding: 30px;
+        width: 90%;
+        max-width: 700px;
+        margin: 20px auto;
+    }
+
+    /* Header Section */
+    .book_header {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 25px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 15px;
+    }
+
+    .book_header img {
+        width: 150px;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .book_details .salon-name {
+        font-size: 22px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .book_details .appointment-details {
+        font-size: 15px;
+        color: #555;
+    }
+
+    /* Form Elements */
+    .label {
+        font-weight: bold;
+        margin-top: 15px;
+        color: #555;
+        display: block;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        margin-top: 5px;
+    }
+
+    /* Slots Section */
+    .slots {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .slot {
+        background-color: #4CAF50; /* Green for available */
+        border: none;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .slot:hover:not([disabled]) {
+        background-color: #45a049;
+    }
+
+    .slot.filled {
+        background-color: #f44336; /* Red for booked */
+        cursor: not-allowed;
+    }
+
+    .slot.selected {
+        background-color: #0056b3; /* Blue for selected */
+        border: 2px solid #007BFF;
+    }
+
+    /* Error Message Styling */
+    .error-message {
+        color: #f44336;
+        margin-top: 10px;
+        font-weight: bold;
+        display: none; /* Initially hidden */
+    }
+
+    /* Confirm Button */
+    .confirm-button {
+        width: 100%;
+        background-color: #007BFF;
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 25px;
+        transition: background-color 0.3s;
+    }
+
+    .confirm-button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Responsive Styling */
+    @media (max-width: 600px) {
+        .book_header {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .book_header img {
+            width: 100px;
+        }
+
+        .book_details {
+            text-align: center;
+        }
+
+        .slots {
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="book_container">
+    <div class="book_header">
+        <img src="{% static 'images/'|add:salon.image_name %}" alt="{{ salon.name }}">
+        <div class="book_details">
+            <div class="salon-name">{{ salon.name }}</div>
+            <div class="appointment-details">
+                <span id="service-name">Service: {{ service.name }}</span><br>
+                <span id="estimated-duration">Estimated Duration: {{ service.duration }} mins</span><br>
+                <span id="selected-date">Date: Not selected</span>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" action="{% url 'book_appointment' salon_id=salon.id service_id=service.id %}">
+        {% csrf_token %}
+        <div class="date-selection">
+            <label for="appointment-date" class="label">Choose a Date:</label>
+            <input 
+                type="date" 
+                id="appointment-date" 
+                name="appointment-date" 
+                class="input-field" 
+                onchange="updateDate()" 
+                placeholder="Select a date">
+        </div>
+
+        <h2>Available Slots</h2>
+        <div class="slots">
+            {% for slot in slots %}
+                <button 
+                    class="slot {% if slot.is_filled %}filled{% endif %}" 
+                    onclick="selectSlot(this, event)" 
+                    data-slot="{{ slot.time }}" 
+                    {% if slot.is_filled %}disabled{% endif %}>
+                    {{ slot.time }}{% if slot.is_filled %} (Booked){% endif %}
+                </button>
+            {% endfor %}
+        </div>
+
+        <input type="hidden" name="selected-slot" id="selected-slot" value="">
+
+        <div class="error-message" id="error-message">Please select a valid slot and date.</div>
+
+        <button type="submit" class="confirm-button">Confirm Appointment</button>
+    </form>
+
+    <script>
+        function updateDate() {
+            const dateInput = document.getElementById("appointment-date").value;
+            document.getElementById("selected-date").textContent = `Date: ${dateInput || 'Not selected'}`;
+            
+            if (dateInput) {
+                // Make AJAX request to fetch booked slots
+                const salonId = "{{ salon.id }}";
+                const serviceId = "{{ service.id }}";
+                const url = `{% url 'get_booked_slots' salon_id=salon.id service_id=service.id %}?date=${dateInput}`;
+                
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.booked_slots) {
+                            updateSlotColors(data.booked_slots);
+                        } else {
+                            console.error('Error fetching booked slots:', data.error);
+                        }
+                    })
+                    .catch(error => console.error('Fetch error:', error));
+            }
+        }
+    
+        function updateSlotColors(bookedSlots) {
+            const slotButtons = document.querySelectorAll('.slot');
+            slotButtons.forEach(button => {
+                const slotTime = button.getAttribute('data-slot');
+                if (bookedSlots.includes(slotTime)) {
+                    button.classList.add('filled');
+                    button.classList.remove('available');
+                    button.disabled = true;
+                    button.textContent = `${slotTime} (Booked)`;
+                } else {
+                    button.classList.add('available');
+                    button.classList.remove('filled');
+                    button.disabled = false;
+                    button.textContent = slotTime;
+                }
+            });
+        }
+    
+        function selectSlot(slotButton, event) {
+            event.preventDefault();
+    
+            // Deselect previous slot
+            const selectedSlot = document.querySelector(".slot.selected");
+            if (selectedSlot) {
+                selectedSlot.classList.remove("selected");
+            }
+    
+            // Select current slot
+            slotButton.classList.add("selected");
+            document.getElementById("selected-slot").value = slotButton.getAttribute("data-slot");
+        }
+    </script>
+</div>
+{% endblock %}

@@ -1,0 +1,147 @@
+/* Base styling */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Open+Sans:wght@400&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f5f2;
+    color: #333;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Neumorphism effect */
+.neumorphic {
+    background: #f8f5f2;
+    border-radius: 15px;
+    box-shadow: 5px 5px 15px #c1b9b2, 
+                -5px -5px 15px #ffffff;
+    padding: 20px;
+    margin: 20px;
+}
+
+h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 0.5px; /* Slightly increase letter spacing */
+}
+
+p {
+    font-size: 16px; /* Standard body text */
+    line-height: 1.5; /* Comfortable line height */
+    margin: 10px 0; /* Adds space between paragraphs */
+}
+
+h1 {
+    font-size: 36px; /* Large size for headings */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Subtle shadow for effect */
+    color: #373e50; /* Consistent with theme */
+}
+/* Header Section */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background-color: #f8f5f2;
+    box-shadow: inset 5px 5px 15px #c1b9b2, inset -5px -5px 15px #ffffff;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 15px; /* Adjust gap for spacing */
+}
+
+nav ul li {
+    display: inline-block;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    padding: 5px 15px; /* Reduced padding for a non-button look */
+    border-radius: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+nav ul li a:hover {
+    background-color: #000000;
+    padding: 5px 15px; /* Reduced padding for a non-button look */
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    outline: 2px solid #373e50; /* Highlight focused element */
+    outline-offset: 2px; /* Space between outline and element */
+}
+
+nav ul li a:focus,
+.btn:focus {
+    outline: 2px solid #373e50; /* Highlight focused element */
+    outline-offset: 2px; /* Space between outline and element */
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+
+/* Search Form */
+.search-form {
+    display: flex;
+    align-items: center; /* Aligns search input and button vertically */
+    gap: 10px;
+}
+
+.search-form input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 200px;
+    box-shadow: inset 3px 3px 6px #c1b9b2, inset -3px -3px 6px #ffffff; /* Neumorphic effect */
+}
+
+.search-form button {
+    padding: 8px 12px;
+    background-color: #373e50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 3px 3px 6px #c1b9b2, -3px -3px 6px #ffffff; /* Neumorphic effect */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.search-form button:hover {
+    background-color: #ffffff;
+    transform: translateY(-2px);
+}
+
+
+/* Footer Section */
+footer {
+    text-align: center;
+    padding: 15px;
+    background-color: #f8f5f2;
+    box-shadow: inset 5px 5px 15px #c1b9b2, inset -5px -5px 15px #ffffff;
+    margin-top: auto;
+    color: #373e50;
+}

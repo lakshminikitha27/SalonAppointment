@@ -1,0 +1,344 @@
+/* Base styling */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Open+Sans:wght@400&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f5f2;
+    color: #333;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Neumorphism effect */
+.neumorphic {
+    background: #f8f5f2;
+    border-radius: 15px;
+    box-shadow: 5px 5px 15px #c1b9b2, 
+                -5px -5px 15px #ffffff;
+    padding: 20px;
+    margin: 20px;
+}
+
+h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 0.5px; /* Slightly increase letter spacing */
+}
+
+p {
+    font-size: 16px; /* Standard body text */
+    line-height: 1.5; /* Comfortable line height */
+    margin: 10px 0; /* Adds space between paragraphs */
+}
+
+h1 {
+    font-size: 36px; /* Large size for headings */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Subtle shadow for effect */
+    color: #373e50; /* Consistent with theme */
+}
+/* Header Section */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background-color: #f8f5f2;
+    box-shadow: inset 5px 5px 15px #c1b9b2, inset -5px -5px 15px #ffffff;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 15px; /* Adjust gap for spacing */
+}
+
+nav ul li {
+    display: inline-block;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    padding: 5px 15px; /* Reduced padding for a non-button look */
+    border-radius: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+nav ul li a:hover {
+    background-color: #373e50;
+    padding: 5px 15px; /* Reduced padding for a non-button look */
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    outline: 2px solid #373e50; /* Highlight focused element */
+    outline-offset: 2px; /* Space between outline and element */
+}
+
+nav ul li a:focus,
+.btn:focus {
+    outline: 2px solid #373e50; /* Highlight focused element */
+    outline-offset: 2px; /* Space between outline and element */
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+/* span*/
+.name{
+    display: block; 
+    font-weight: bold; 
+    font-size: 20px; 
+    margin: 10px 0; 
+    color: #333;
+    text-transform: capitalize;
+}
+
+.price {
+    display: block; 
+    font-size: 18px; 
+    color: #373e50; 
+    font-weight: bold; 
+    margin-bottom: 15px;
+}
+
+.add_to_cart{
+    display: inline-block; 
+    background-color: #373e50; 
+    color: white; 
+    padding: 12px 30px; 
+    text-decoration: none; 
+    border-radius: 25px; 
+    font-weight: bold; 
+    text-align: center; 
+    cursor: pointer; 
+    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Search Form */
+.search-form {
+    display: flex;
+    align-items: center; /* Aligns search input and button vertically */
+    gap: 10px;
+}
+
+.search-form input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 200px;
+    box-shadow: inset 3px 3px 6px #c1b9b2, inset -3px -3px 6px #ffffff; /* Neumorphic effect */
+}
+
+.search-form button {
+    padding: 8px 12px;
+    background-color: #373e50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 3px 3px 6px #c1b9b2, -3px -3px 6px #ffffff; /* Neumorphic effect */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.search-form button:hover {
+    background-color: #000000;
+    transform: translateY(-2px);
+}
+
+/* Hero Section */
+.hero {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 400px; /* Adjust this value for responsiveness */
+    background: linear-gradient(145deg, #373e50, #222d3d);
+    border-radius: 20px;
+    box-shadow: 8px 8px 16px #c1b9b2, 
+                -8px -8px 16px #ffffff;
+    overflow: hidden; /* Ensure content stays inside the hero */
+    position: relative; /* Allow absolute positioning of child elements */
+}
+
+/* Background Image */
+.hero-image {
+    position: absolute;
+    top: 10;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill; /* Ensures the image covers the area */
+    /* Match the border-radius of the hero container */
+    opacity: 0.8; /* Optional: adjust opacity to blend with text */
+    z-index: 0;
+}
+
+/* Hero Text */
+.hero h1 {
+    position: relative;
+    z-index: 1; /* Ensures the text appears above the image */
+    text-align: center;
+    font-size: 38px; /* Font size for larger screens */
+    font-weight: bold;
+    color: #ffffff; /* Text color to contrast against the image */
+    text-shadow: 2px 2px 4px #000000; /* Optional: adds a subtle shadow for better contrast */
+    background: none; /* Ensure no background color */
+    padding: 0; /* Ensure no padding that could create a box effect */
+    margin: 0; /* Ensure no margin that could create a box effect */
+}
+
+/* Responsive Font Size */
+@media (max-width: 768px) {
+    .hero {
+        height: 200px; /* Adjust height for smaller screens */
+    }
+    .hero h1 {
+        font-size: 28px; /* Smaller font size for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .hero {
+        height: 150px; /* Further adjust height for mobile */
+    }
+
+    .hero h1 {
+        font-size: 24px; /* Even smaller font size */
+    }
+}
+
+.nearby-salons {
+    padding: 20px;
+    max-width: 1200px;
+    margin: left;   
+}
+
+.salon-grid {
+    display: flex;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.salon-item {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 750px;
+}
+
+.salon-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.salon-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+/* Text Styling */
+.salon-item h3 {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 20px;
+}
+
+.salon-item p {
+    text-align: center;
+    margin-top: 5px;
+    font-size: 16px;
+}
+
+.book-appointment {
+    display: inline-block;
+    background-color: #000000;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    text-decoration: none;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.book-appointment:hover {
+    background-color: #000000;
+}
+
+
+
+/* Footer Section */
+footer {
+    text-align: center;
+    padding: 15px;
+    background-color: #f8f5f2;
+    box-shadow: inset 5px 5px 15px #c1b9b2, inset -5px -5px 15px #ffffff;
+    margin-top: auto;
+    color: #373e50;
+}
+
+@media (max-width: 768px) {
+    .salon-grid, .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .salon-grid, .product-grid {
+        grid-template-columns: 1fr;
+    }
+
+    nav ul {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: #f8f5f2;
+    box-shadow: 5px 5px 15px #c1b9b2, -5px -5px 15px #ffffff;
+    color: #333;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    background-color: #373e50;
+    color: #fff;
+}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SS ENTERPRISES</title>
+
+    <!-- Boxicons CDN -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'login.css' %}">
+</head>
+
+<body>
+    <div id="popup" class="popup"></div>
+    <div class="wrapper">
+        <div class="form-box login">
+            <div class="logo-title-container">
+                <div class="logo">
+                    <img src="{% static 'images/logo.jpg' %}" alt="Logo">
+                </div>
+                <h2 class="title animation" style="--i:0; --j:21">Login</h2>
+            </div>
+            {% if messages %}
+                <div class="message-container">
+                    {% for message in messages %}
+                        <p class="error">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <form action="{% url 'login' %}" method="POST">
+                {% csrf_token %}
+                <div class="input-box animation" style="--i:1; --j:22">
+                    <input type="text" id="username" name="username" required>
+                    <label for="username">Username</label>
+                    <i class='bx bxs-user'></i>
+                </div>
+
+                <div class="input-box animation" style="--i:2; --j:23">
+                    <input type="password" id="password" name="password" required>
+                    <label for="password">Password</label>
+                    <i class='bx bxs-lock-alt' id="toggle-password"></i>
+                </div>
+                
+                <button type="submit" class="btn animation" style="--i:3; --j:24">Login</button>
+                <div class="linkTxt animation" style="--i:5; --j:25">
+                    <p>Don't have an account? <a href="{% url 'register' %}" class="register-link">Sign Up</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // Create a JavaScript array to store messages
+            const messages = [];
+            
+            // Loop over Django messages and add them to the messages array
+            {% for message in messages %}
+            messages.push({ 
+                category: "{{ message.tags|escapejs }}", 
+                text: "{{ message|escapejs }}" 
+            });
+            {% endfor %}
+            
+            // Display messages in the popup
+            const popup = document.getElementById('popup');
+        
+            if (messages.length > 0) {
+                messages.forEach(function(message) {
+                    popup.textContent = message.text;  // Show message text
+                    popup.classList.add('show');
+            
+                    // Hide the pop-up after 3 seconds
+                    setTimeout(function() {
+                        popup.classList.remove('show');
+                    }, 3000);
+                });
+            }
+        };
+    </script>   
+    
+</body>
+
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SS ENTERPRISES{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <style>
+        /* Styles for the pop-up message */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 5px;
+            right: 41%;
+            background-color: #373e50;
+            color: white;
+            padding: 15px 75px;
+            border-radius: 5px;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+            font-size: larger;
+        }
+        .popup.show {
+            display: block;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="logo">
+            <img src="{% static 'images/logo.jpg' %}" alt="Logo" style="height: 50px;">
+        </div>
+        <nav>
+            <ul>
+                <li>
+                    <form action="{% url 'search' %}" method="POST" class="search-form">
+                        {% csrf_token %}
+                        <input type="text" name="query" placeholder="Search salons..." required>
+                        <button type="submit">Search</button>
+                    </form>
+                </li>
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'all_services' %}">Services</a></li>
+                <li><a href="{% url 'all_salons' %}">Salons</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'profile' %}">Hello, {{ user.username }}</a></li>
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Logout</button>  <!-- Logout button -->
+                    </form>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'register' %}">Signup</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content Section -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>© 2024 Salon Appointment Website | Terms | Privacy | Contact</p>
+    </footer>
+    
+    <script>
+        window.onload = function() {
+            const messages = {{ messages | safe }};
+            const popup = document.getElementById('popup');
+
+            if (messages.length > 0) {
+                messages.forEach(message => {
+                    popup.textContent = message.message;
+                    popup.classList.add('show');
+
+                    // Hide the pop-up after 3 seconds
+                    setTimeout(() => {
+                        popup.classList.remove('show');
+                    }, 3000);
+                });
+            }
+        };
+    </script>
+</body>
+</html>

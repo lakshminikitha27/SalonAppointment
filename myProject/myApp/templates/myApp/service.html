@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+{% extends "myApp/base.html" %}
+{% block title %}Salon Details - SS ENTERPRISES{% endblock %}
+
+{% block content %}
+{% load static %}
+
+    <style>
+        /* Styles for the pop-up message */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 5px;
+            right: 41%;
+            background-color: #373e50;
+            color: white;
+            padding: 15px 75px;
+            border-radius: 5px;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+            font-size: larger;
+        }
+        .popup.show {
+            display: block;
+            opacity: 1;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f9fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        section h2 {
+            color: #4CAF50;
+            margin: 20px 0 10px;
+        }
+
+        .salon-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        .salon-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .salon-card p {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .salon-card button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .service-button {
+            background-color: #1e90ff;
+            color: white;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .service-buttons {
+            margin-top: 15px;
+        }
+    </style>
+
+    <!-- Salons Section -->
+    <section>
+    <div style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
+        {% for salon in salons %}
+        <div class="salon-card">
+            {% if salon.image_name %}
+                <img src="{% static 'images/'|add:salon.image_name %}" alt="{{ salon.name }}" style="width: 100%; max-width: 500px; border-radius: 8px; margin-bottom: 10px;">
+            {% else %}
+                <p>No image available</p>
+            {% endif %}
+            <h3>{{ salon.name }}</h3>
+            <p>{{ salon.address }}</p>
+            <p>Rating: {{ salon.rating }}</p>
+            <a href="{% url 'salon_details' salon.id %}">
+                <button>View Details</button>
+            </a>            
+        </div>
+        {% empty %}
+        <p>No salons available for this service at the moment.</p>
+        {% endfor %}
+    </div>
+</div>
+<script>
+    window.onload = function() {
+        const messages = {{ messages | safe }};
+        const popup = document.getElementById('popup');
+
+        if (messages.length > 0) {
+            messages.forEach(message => {
+                popup.textContent = message.message;
+                popup.classList.add('show');
+
+                // Hide the pop-up after 3 seconds
+                setTimeout(() => {
+                    popup.classList.remove('show');
+                }, 3000);
+            });
+        }
+    };
+</script>
+{% endblock %}
