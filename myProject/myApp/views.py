@@ -77,6 +77,19 @@ def search(request):
     # For example, search for products or salons based on the query
     return render(request, 'search_results.html', {'query': query})
 
+def select_salon_service(request, salon_id, service_id):
+    # Fetch salon and service objects
+    salon = Salon.objects.get(id=salon_id)
+    service = Service.objects.get(id=service_id)
+
+    # Store in session
+    request.session['selected_salon'] = salon.id
+    request.session['selected_service'] = service.id
+    # Debugging: Print session data
+    print("Session Data:", request.session.items())
+
+    return redirect('book_appointment')
+
 def service_detail(request, service_id):
     service = get_object_or_404(Service, id=service_id)  # Retrieves the service or returns a 404 error if not found
     salons = service.salons.all().distinct()  # Get salons offering this service
@@ -92,146 +105,159 @@ def profile(request):
     # Logic to handle the profile page
     return render(request, 'myApp/profile.html')
 
-from django.utils.timezone import datetime, timedelta
 
-from django.utils.timezone import datetime, timedelta
+from django.db.utils import IntegrityError
 
 def book_appointment(request, salon_id, service_id):
     salon = get_object_or_404(Salon, id=salon_id)
     service = get_object_or_404(Service, id=service_id)
 
-    # Generate dynamic slots (10:00 AM to 5:00 PM, 30-min intervals)
+    # Get selected date from the request
+    selected_date = request.POST.get("appointment-date") or str(datetime.today().date())
+
+    # Get current date and time
+    now = datetime.now()
+    today_date = now.date()
+    current_time = now.strftime("%H:%M")
+
+    # Generate available slots
     start_time = datetime.strptime("10:00", "%H:%M")
     end_time = datetime.strptime("17:00", "%H:%M")
     time_slots = []
+
     while start_time < end_time:
-        time_slots.append(start_time.strftime("%H:%M"))
+        slot_time = start_time.strftime("%H:%M")
+
+        # 🚨 **Only allow future time slots for today's date**
+        if str(selected_date) == str(today_date) and slot_time < current_time:
+            start_time += timedelta(minutes=30)
+            continue  # Skip past slots
+
+        time_slots.append(slot_time)
         start_time += timedelta(minutes=30)
 
-    # Fetch selected date
-    selected_date = request.POST.get("appointment-date", datetime.today().date())
-
-    # Fetch booked slots for the selected date, salon, and service
-    booked_slots = BookedSlot.objects.filter(
+    # Fetch booked slots for this salon & service
+    booked_slots = set(BookedSlot.objects.filter(
         date=selected_date,
-        salon=salon,
-        service=service,
-    ).values_list("time", flat=True)
+        salon_id=salon.id,
+        service_id=service.id
+    ).values_list("time", flat=True))
 
-    # Mark slots as booked or available
+    # Mark slots as filled if they are booked
     slots = [{"time": slot, "is_filled": slot in booked_slots} for slot in time_slots]
 
-    if request.method == "POST":
-        selected_slot = request.POST.get("selected-slot")
-        if selected_slot and selected_date:
-            # Check if the slot is already booked
-            if selected_slot not in booked_slots:
-                # Save the booked slot
-                customer_name = request.user.username  # Assuming logged-in user has a `username`
-                BookedSlot.objects.create(
-                    customer_name=customer_name,
-                    salon=salon,
-                    service=service,
-                    date=selected_date,
-                    time=selected_slot,
-                )
-                # Redirect to payment
-                return redirect(
-                    f"/payment/?salon={salon.name}&service={service.name}&date={selected_date}&slot={selected_slot}&price={service.price}"
-                )
-            else:
-                # Slot is already booked; display an error message
-                return render(
-                    request,
-                    "myApp/book_appointment.html",
-                    {
-                        "salon": salon,
-                        "service": service,
-                        "slots": slots,
-                        "error": f"Slot {selected_slot} is already booked. Please choose another slot.",
-                    },
-                )
-
-    return render(request, "myApp/book_appointment.html", {"salon": salon, "service": service, "slots": slots})
-
-def get_booked_slots(request, salon_id, service_id):
-    date = request.GET.get('date')
-    if date:
-        booked_slots = BookedSlot.objects.filter(
-            salon_id=salon_id,
-            service_id=service_id,
-            date=date
-        ).values_list('time', flat=True)
-        return JsonResponse({'booked_slots': list(booked_slots)})
-    return JsonResponse({'error': 'Invalid date or parameters'}, status=400)
-
-def payment(request):
-    if request.method == "POST":
-        # Get booking details from the POST request
-        salon_name = request.POST.get("salon")
-        service_name = request.POST.get("service")
-        date = request.POST.get("date")
-        slot = request.POST.get("slot")
-        price = request.POST.get("price")
-        customer_name = request.POST.get("customer_name")
-        user_id = request.user.id  # Assuming the user is authenticated
-
-        # Retrieve necessary objects
-        try:
-            salon = Salon.objects.get(name=salon_name)
-            service = Service.objects.get(name=service_name)
-            user = UserDetails.objects.get(pk=user_id)  # Replace with your user model if different
-        except Salon.DoesNotExist:
-            print(f"Salon '{salon_name}' not found")
-            return redirect('payment')  # Redirect back to the payment page
-        except Service.DoesNotExist:
-            print(f"Service '{service_name}' not found")
-            return redirect('payment')  # Redirect back to the payment page
-        except UserDetails.DoesNotExist:
-            print(f"User with ID '{user_id}' not found")
-            return redirect('payment')
-
-        # Save to BookedSlot table
-        booked_slot = BookedSlot.objects.create(
-            time=slot,
-            date=date,
-            salon=salon,
-            service=service,
-            customer_name=customer_name
-        )
-
-        # Save to Appointment table
-        appointment = Appointment.objects.create(
-            salon=salon,
-            service=service,
-            user=user,
-            date=date,
-            slot=booked_slot  # Reference the created BookedSlot
-        )
-
-        print(f"Booking saved: {booked_slot}")
-        print(f"Appointment saved: {appointment}")
-
-        # Redirect to a success page
-        return redirect("payment_success")  # Replace with your success page route
-
-    # For GET requests, handle parameters and render the payment page
-    salon = request.GET.get("salon")
-    service_name = request.GET.get("service")
-    if not service_name:
-        return HttpResponse("Service parameter is missing", status=400)
-    date = request.GET.get("date")
-    slot = request.GET.get("slot")
-    service = get_object_or_404(Service, name=service_name)
-    service_price = service.price
-
-    return render(request, "myApp/payment.html", {
+    return render(request, "myApp/book_appointment.html", {
         "salon": salon,
         "service": service,
-        "date": date,
-        "slot": slot,
-        "service_price": service_price,
+        "slots": slots,
     })
+
+def get_booked_slots(request, salon_id, service_id):
+    selected_date = request.GET.get("date")
+    
+    # Ensure correct filtering by salon and service
+    booked_slots = list(BookedSlot.objects.filter(
+        date=selected_date,
+        salon_id=salon_id,
+        service_id=service_id
+    ).values_list("time", flat=True))
+
+    print(f"API Response for Salon {salon_id}, Service {service_id}, Date {selected_date}: {booked_slots}")
+    
+    return JsonResponse({"booked_slots": booked_slots})
+
+from django.contrib.auth.decorators import login_required
+
+@login_required(login_url="/login/")  # Redirect to login if user is not authenticated
+def payment(request):
+    if request.method == "POST":
+        # Retrieve booking details from session
+        salon_id = request.session.get("selected_salon")
+        service_id = request.session.get("selected_service")
+        selected_date = request.session.get("selected_date")
+        selected_slot = request.session.get("selected_slot")
+        user_id = request.user.id  # User is authenticated due to @login_required
+
+        if not all([salon_id, service_id, selected_date, selected_slot, user_id]):
+            return redirect("book_appointment")  # Redirect if session data is missing
+
+        try:
+            # Retrieve necessary objects
+            salon = Salon.objects.get(id=salon_id)
+            service = Service.objects.get(id=service_id)
+            user = UserDetails.objects.get(pk=user_id)  # Use your actual user model
+
+            # **Check if the slot is already booked**
+            booked_slot, created = BookedSlot.objects.get_or_create(
+                time=selected_slot,
+                date=selected_date,
+                salon=salon,
+                service=service,
+                defaults={"customer_name": request.user.username}  # Only set if new
+            )
+
+            if not created:
+                return render(request, "myApp/payment.html", {
+                    "salon": salon.name,
+                    "service": service,
+                    "date": selected_date,
+                    "slot": selected_slot,
+                    "service_price": service.price,
+                    "error": f"Slot {selected_slot} is already booked. Please choose another slot.",
+                })
+
+            # **Save to Appointment table**
+            appointment = Appointment.objects.create(
+                salon=salon,
+                service=service,
+                user=user,
+                date=selected_date,
+                slot=booked_slot  # Reference the created BookedSlot
+            )
+
+            print(f"Booking saved: {booked_slot}")
+            print(f"Appointment saved: {appointment}")
+
+            # Clear session data after successful booking
+            request.session.pop("selected_salon", None)
+            request.session.pop("selected_service", None)
+            request.session.pop("selected_date", None)
+            request.session.pop("selected_slot", None)
+
+            return redirect("payment_success")  # Redirect to success page
+
+        except (Salon.DoesNotExist, Service.DoesNotExist, UserDetails.DoesNotExist):
+            return redirect("payment")  # Redirect if any object is missing
+        except IntegrityError:
+            return render(request, "myApp/payment.html", {
+                "salon": salon.name,
+                "service": service,
+                "date": selected_date,
+                "slot": selected_slot,
+                "service_price": service.price,
+                "error": "Payment failed. Please try again.",
+            })
+
+    # **For GET requests, retrieve booking details from session**
+    salon_id = request.session.get("selected_salon")
+    service_id = request.session.get("selected_service")
+    selected_date = request.session.get("selected_date")
+    selected_slot = request.session.get("selected_slot")
+
+    if not all([salon_id, service_id, selected_date, selected_slot]):
+        return HttpResponse("Session data is missing. Please restart the booking process.", status=400)
+
+    salon = get_object_or_404(Salon, id=salon_id)
+    service = get_object_or_404(Service, id=service_id)
+
+    return render(request, "myApp/payment.html", {
+        "salon": salon.name,
+        "service": service,
+        "date": selected_date,
+        "slot": selected_slot,
+        "service_price": service.price,
+    })
+
 
 
 def give_feedback(request, appointment_id):
@@ -342,3 +368,8 @@ def edit_profile(request):
 
     # Handle the GET request or render an edit profile form if needed
     return render(request, 'myApp/edit_profile.html', {'user': request.user})
+
+def logout_view(request):
+    messages.success(request, '')  # Clear any success messages
+    logout(request)
+    return redirect('home') 

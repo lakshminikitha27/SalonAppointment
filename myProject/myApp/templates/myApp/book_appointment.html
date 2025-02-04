@@ -82,10 +82,18 @@
         background-color: #45a049;
     }
 
-    .slot.filled {
-        background-color: #f44336; /* Red for booked */
-        cursor: not-allowed;
-    }
+    /* Styling for booked slots */
+button.slot.filled {
+    background-color: #ddd; /* Light gray for booked slots */
+    color: #666;  /* Gray text */
+    cursor: not-allowed; /* Disable cursor pointer */
+}
+
+/* Styling for disabled buttons */
+button.slot[disabled] {
+    background-color: #f0f0f0; /* Slightly lighter background */
+    color: #ccc; /* Lighter gray text */
+}
 
     .slot.selected {
         background-color: #0056b3; /* Blue for selected */
@@ -162,21 +170,22 @@
                 name="appointment-date" 
                 class="input-field" 
                 onchange="updateDate()" 
+                min="" 
                 placeholder="Select a date">
         </div>
 
         <h2>Available Slots</h2>
-        <div class="slots">
-            {% for slot in slots %}
-                <button 
-                    class="slot {% if slot.is_filled %}filled{% endif %}" 
-                    onclick="selectSlot(this, event)" 
-                    data-slot="{{ slot.time }}" 
-                    {% if slot.is_filled %}disabled{% endif %}>
-                    {{ slot.time }}{% if slot.is_filled %} (Booked){% endif %}
-                </button>
-            {% endfor %}
-        </div>
+<div class="slots">
+    {% for slot in slots %}
+        <button 
+            class="slot {% if slot.is_filled %}filled{% endif %}" 
+            onclick="selectSlot(this, event)" 
+            data-slot="{{ slot.time }}" 
+            {% if slot.is_filled %}disabled="disabled"{% endif %}>
+            {{ slot.time }}{% if slot.is_filled %} (Booked){% endif %}
+        </button>
+    {% endfor %}
+</div>
 
         <input type="hidden" name="selected-slot" id="selected-slot" value="">
 
@@ -187,45 +196,54 @@
 
     <script>
         function updateDate() {
-            const dateInput = document.getElementById("appointment-date").value;
-            document.getElementById("selected-date").textContent = `Date: ${dateInput || 'Not selected'}`;
-            
-            if (dateInput) {
-                // Make AJAX request to fetch booked slots
-                const salonId = "{{ salon.id }}";
-                const serviceId = "{{ service.id }}";
-                const url = `{% url 'get_booked_slots' salon_id=salon.id service_id=service.id %}?date=${dateInput}`;
-                
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.booked_slots) {
-                            updateSlotColors(data.booked_slots);
-                        } else {
-                            console.error('Error fetching booked slots:', data.error);
-                        }
-                    })
-                    .catch(error => console.error('Fetch error:', error));
+    const dateInput = document.getElementById("appointment-date").value;
+    
+    if (!dateInput) return;
+
+    const selectedDate = new Date(dateInput);
+    const today = new Date();
+    
+    if (selectedDate.toDateString() === today.toDateString()) {
+        const currentTime = today.getHours() * 60 + today.getMinutes(); // Get time in minutes
+        
+        document.querySelectorAll(".slot").forEach(slot => {
+            const [hours, minutes] = slot.getAttribute("data-slot").split(":").map(Number);
+            const slotTime = hours * 60 + minutes;  // Convert slot to minutes
+
+            if (slotTime < currentTime) {
+                slot.classList.add("filled");
+                slot.disabled = true;
+                slot.textContent += " (Passed)";
             }
-        }
+        });
+    }
+}
+
+// Hide past time slots when selecting today
+document.addEventListener("DOMContentLoaded", function () {
+    let today = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
+    document.getElementById("appointment-date").setAttribute("min", today);
+});
+    
+    
+
     
         function updateSlotColors(bookedSlots) {
-            const slotButtons = document.querySelectorAll('.slot');
-            slotButtons.forEach(button => {
-                const slotTime = button.getAttribute('data-slot');
-                if (bookedSlots.includes(slotTime)) {
-                    button.classList.add('filled');
-                    button.classList.remove('available');
-                    button.disabled = true;
-                    button.textContent = `${slotTime} (Booked)`;
-                } else {
-                    button.classList.add('available');
-                    button.classList.remove('filled');
-                    button.disabled = false;
-                    button.textContent = slotTime;
-                }
-            });
+    const slotButtons = document.querySelectorAll('.slot');
+    slotButtons.forEach(button => {
+        const slotTime = button.getAttribute('data-slot').trim();
+        if (bookedSlots.includes(slotTime) || bookedSlots.includes(slotTime + ":00")) {
+            button.classList.add('filled');
+            button.disabled = true;
+            button.textContent = `${slotTime} (Booked)`;
+        } else {
+            button.classList.remove('filled');
+            button.disabled = false;
+            button.textContent = slotTime;
         }
+    });
+}
+
     
         function selectSlot(slotButton, event) {
             event.preventDefault();

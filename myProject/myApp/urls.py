@@ -17,6 +17,7 @@ urlpatterns = [
     path('services/', views.service_detail, name='Services'),
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.edit_profile, name='edit_profile'), 
+    path('select_salon_service/<int:salon_id>/<int:service_id>/', views.select_salon_service, name='select_salon_service'),
     path('book/<int:salon_id>/<int:service_id>/', views.book_appointment, name='book_appointment'),
     path('payment/', views.payment, name='payment'),
     path('user-details/', views.display_user_details, name='user_details'),
