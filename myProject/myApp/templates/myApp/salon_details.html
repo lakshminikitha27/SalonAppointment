@@ -120,7 +120,7 @@
             <br>
             <p class="salon-address">
                 {{ salon.address }}
-                <a href="https://www.google.com/maps/search/?api=1&query={{ salon.latitude }},{{ salon.longitude }}" target="_blank">
+                <a href="https://www.google.com/maps?q={{ salon.latitude }},{{ salon.longitude }}" target="_blank">
                     <img src="{% static 'images/location-icon.png' %}" alt="Location" class="location-icon">
                 </a>
             </p>

@@ -12,6 +12,9 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Appointment, UserDetails
 from datetime import datetime, timedelta
+from django.db.models import F
+from math import radians, sin, cos, sqrt, atan2
+from geopy.geocoders import Nominatim
 from django.http import HttpResponse
 from django.http import JsonResponse
 
@@ -59,17 +62,53 @@ def login_view(request):
 
     return render(request, 'myApp/login.html')
 
+from geopy.exc import GeocoderTimedOut
+import time  # Import time for retry delays
+
+def calculate_distance(lat1, lon1, lat2, lon2):
+    """ Haversine formula to calculate the distance between two latitude/longitude points. """
+    R = 6371  # Radius of the Earth in km
+    dlat = radians(lat2 - lat1)
+    dlon = radians(lon2 - lon1)
+    a = sin(dlat / 2) ** 2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    return R * c
 
 def home(request):
-    # Attempt to load the template manually for debugging
-    try:
-        template = loader.get_template('home.html')
-    except Exception as e:
-        print("Error loading template:", e)
+    user_lat = request.GET.get('lat')
+    user_lon = request.GET.get('lon')
 
-    nearby_salons = Salon.objects.all()
+    if not user_lat or not user_lon:
+        return render(request, 'myApp/home.html', {'nearby_salons': []})  # No user location data
+
+    try:
+        user_lat, user_lon = float(user_lat), float(user_lon)
+    except ValueError:
+        return render(request, 'myApp/home.html', {'nearby_salons': []})
+
+    salons = Salon.objects.values('id', 'name', 'rating', 'image_name', 'address', 'latitude', 'longitude')
+    print(f"Found {len(salons)} salons.")  # Fetch addresses
+    if not salons:
+        print(f"No salons found in the database.")
+
+    nearby_salons = []
+    for salon in salons:
+        print(f"Salon: {salon['name']}, Address: {salon['address']}")
+        
+        # Use latitude and longitude from the database
+        lat = salon['latitude']
+        lon = salon['longitude']
+        
+        if lat is not None and lon is not None:
+            distance = calculate_distance(user_lat, user_lon, lat, lon)
+            if distance <= 10:  # Show salons within 10 km
+                salon['distance'] = round(distance, 2)
+                nearby_salons.append(salon)
+
+    nearby_salons = sorted(nearby_salons, key=lambda x: x['distance'])[:3]  # Limit to 3 nearest salons
     services = Service.objects.all()
-    return render(request, 'myApp/home.html', {'nearby_salons': nearby_salons,  'services': services})
+
+    return render(request, 'myApp/home.html', {'nearby_salons': nearby_salons, 'services': services})
 
 def search(request):
     query = request.POST.get('query')
@@ -318,6 +357,35 @@ def get_lat_lon(address):
         print(f"Error during geocoding: {e}")
         return None, None
 
+from geopy.distance import geodesic
+
+def get_nearby_salons(request):
+    user_lat = request.GET.get("lat")
+    user_lon = request.GET.get("lon")
+
+    if not user_lat or not user_lon:
+        return JsonResponse({"error": "Invalid location"}, status=400)
+
+    user_location = (float(user_lat), float(user_lon))
+    nearby_salons = []
+
+    for salon in Salon.objects.all():
+        if salon.latitude and salon.longitude:
+            salon_location = (salon.latitude, salon.longitude)
+            distance = geodesic(user_location, salon_location).km  # Calculate distance
+            nearby_salons.append({
+                "name": salon.name,
+                "address": salon.address,
+                "distance": round(distance, 2),
+                "image_url": salon.image.url if salon.image else "",
+                "rating": salon.rating if hasattr(salon, "rating") else 0,
+                "id": salon.id
+            })
+
+    # Sort salons by distance in ascending order and take the top 3
+    nearby_salons = sorted(nearby_salons, key=lambda x: x["distance"])[:3]
+
+    return JsonResponse({"salons": nearby_salons})
 
 def salon_details(request, salon_id):
     # Use prefetch_related with the correct related name
