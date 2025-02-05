@@ -112,38 +112,42 @@ def book_appointment(request, salon_id, service_id):
     salon = get_object_or_404(Salon, id=salon_id)
     service = get_object_or_404(Service, id=service_id)
 
-    # Get selected date from the request
-    selected_date = request.POST.get("appointment-date") or str(datetime.today().date())
+    if request.method == "POST":
+        selected_date = request.POST.get("appointment-date")
+        selected_slot = request.POST.get("selected-slot")
 
-    # Get current date and time
-    now = datetime.now()
-    today_date = now.date()
-    current_time = now.strftime("%H:%M")
+        if not selected_date or not selected_slot:
+            return render(request, "myApp/book_appointment.html", {
+                "salon": salon,
+                "service": service,
+                "error": "Please select a date and slot.",
+            })
 
-    # Generate available slots
+        # Save to session for payment process
+        request.session["selected_salon"] = salon_id
+        request.session["selected_service"] = service_id
+        request.session["selected_date"] = selected_date
+        request.session["selected_slot"] = selected_slot
+
+        return redirect("payment")  # Redirect to payment
+
+    # Generate all time slots (same as before)
     start_time = datetime.strptime("10:00", "%H:%M")
     end_time = datetime.strptime("17:00", "%H:%M")
     time_slots = []
-
+    
     while start_time < end_time:
         slot_time = start_time.strftime("%H:%M")
-
-        # 🚨 **Only allow future time slots for today's date**
-        if str(selected_date) == str(today_date) and slot_time < current_time:
-            start_time += timedelta(minutes=30)
-            continue  # Skip past slots
-
         time_slots.append(slot_time)
         start_time += timedelta(minutes=30)
 
-    # Fetch booked slots for this salon & service
+    # Fetch booked slots
     booked_slots = set(BookedSlot.objects.filter(
-        date=selected_date,
+        date=datetime.today().date(),
         salon_id=salon.id,
         service_id=service.id
     ).values_list("time", flat=True))
 
-    # Mark slots as filled if they are booked
     slots = [{"time": slot, "is_filled": slot in booked_slots} for slot in time_slots]
 
     return render(request, "myApp/book_appointment.html", {
@@ -151,6 +155,7 @@ def book_appointment(request, salon_id, service_id):
         "service": service,
         "slots": slots,
     })
+
 
 def get_booked_slots(request, salon_id, service_id):
     selected_date = request.GET.get("date")
