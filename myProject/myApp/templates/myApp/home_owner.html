@@ -1,0 +1,127 @@
+
+
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beauty Salon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5ebe0;
+            color: #fff;
+        }
+
+        header {
+            background-color: #2e2545;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e5b299;
+        }
+
+        header nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        header nav ul li {
+            font-size: 1rem;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        header nav ul li:hover {
+            color: #e5b299;
+        }
+
+        .hero {
+            position: relative;
+            text-align: center;
+            color: #fff;
+        }
+
+        .hero img {
+            width: 100%;
+            height: auto;
+        }
+
+        .hero .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(46, 37, 69, 0.6);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero .overlay h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #e5b299;
+        }
+
+        .hero .overlay p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .hero .overlay img {
+            width: 50%; /* Adjust this to set the size of your image */
+            height: auto;
+            border-radius: 5px;
+        }
+
+        footer {
+            background-color: #2e2545;
+            color: #fff;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        footer p {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+ 
+
+    <div class="hero">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBKhL0tYLBjOeAYbVYlQmQUyA7j1AwfoAnPQ&s" alt="Salon Image">
+        <div class="overlay">
+            <h1>Welcome to Beauty Salon</h1>
+            <p>Experience luxury, elegance, and style in every visit.</p>
+ 
+        </div>
+    </div>
+
+   
+
+
+{% endblock %}

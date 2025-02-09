@@ -1,16 +1,16 @@
 # myApp/views.py
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
-from .forms import UserDetailsForm
-from .models import Salon, Service, BookedSlot, ServiceFeedback
+from .forms import UserDetailsForm, OwnerDetailsForm, StaffForm, ServiceForm
+from .models import Salon, Service, BookedSlot, ServiceFeedback, OwnerDetails
 from django.urls import reverse
 from django.template import loader
 from geopy.geocoders import Nominatim
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Appointment, UserDetails
+from .models import Appointment, UserDetails, Staff, Category
 from datetime import datetime, timedelta
 from django.db.models import F
 from math import radians, sin, cos, sqrt, atan2
@@ -30,7 +30,7 @@ def base_view(request):
     }
     return render(request, 'myApp/base.html', context)
 
-def register(request):
+def register_customer(request):
     if request.method == "POST":
         form = UserDetailsForm(request.POST)
         print("POST data:", request.POST)
@@ -47,16 +47,44 @@ def register(request):
         form = UserDetailsForm()
     return render(request, "myApp/register.html", {"form": form})
 
+# User Registration
+def register_owner(request):
+    if request.method == "POST":
+        form = OwnerDetailsForm(request.POST)
+        if form.is_valid():
+            pasword = form.save(commit=False)
+            pasword.password = make_password(form.cleaned_data['password'])
+            pasword.save()
+            messages.success(request, "Account created successfully! Please log in.")
+            return redirect('login')  # Redirect to login page
+        else:
+            messages.error(request, "There were errors in your form. Please try again.")
+    else:
+        form = OwnerDetailsForm()
+    return render(request, "myApp/signup.html", {"form": form})
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        print(f'Username: {username}, Password: {password}')
+        role = request.POST.get('role')  # Get selected role
+
         user = authenticate(request, username=username, password=password)
+
         if user is not None:
-            login(request, user)
-            messages.success(request, 'Successfully logged in!')
-            return redirect('home')
+            # Check role in respective tables
+            if role == "User" and UserDetails.objects.filter(user=user).exists():
+                login(request, user)
+                messages.success(request, 'Successfully logged in as User!')
+                return redirect('user_dashboard')  # Replace with actual dashboard
+
+            elif role == "Owner" and OwnerDetails.objects.filter(user=user).exists():
+                login(request, user)
+                messages.success(request, 'Successfully logged in as Owner!')
+                return redirect('owner_dashboard')  # Replace with actual dashboard
+
+            else:
+                messages.error(request, 'Invalid role selection or user does not exist in the selected category.')
         else:
             messages.error(request, 'Invalid username or password')
 
@@ -74,7 +102,7 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return R * c
 
-def home(request):
+def home_customer(request):
     user_lat = request.GET.get('lat')
     user_lon = request.GET.get('lon')
 
@@ -109,6 +137,76 @@ def home(request):
     services = Service.objects.all()
 
     return render(request, 'myApp/home.html', {'nearby_salons': nearby_salons, 'services': services})
+
+# Home Page
+def home_owner(request):
+    username = request.session.get('username')  # Default to 'Guest' if no session data
+    return render(request, 'myApp/home.html', {'username': username})
+
+# Service List
+@login_required
+def manage_services(request):
+    if 'username' not in request.session:
+        messages.error(request, 'Your session has expired. Please log in again.')
+        return redirect('login')
+
+    services = Service.objects.all()
+    return render(request, 'myApp/manage_services.html', {
+        'services': services,
+        'username': request.session.get('username'),
+    })
+
+# Add Service
+@login_required
+@login_required
+def add_service(request):
+    if request.method == 'POST':
+        form = ServiceForm(request.POST, request.FILES)
+        if form.is_valid():
+            service = form.save(commit=False)
+            service.created_by = request.user  # Assuming each service has a creator
+            service.save()
+            messages.success(request, "Service added successfully!")
+            
+            # Track added services in session
+            user_activity = request.session.get('user_activity', [])
+            user_activity.append(f"Added service: {service.name} at {str(service.created_at)}")
+            request.session['user_activity'] = user_activity
+
+            return redirect('service_list')
+        else:
+            messages.error(request, "There were errors with the service form. Please try again.")
+    
+    form = ServiceForm()
+    return render(request, 'myApp/add_service.html', {
+        'form': form,
+        'username': request.session.get('username'),
+    })
+
+
+# Edit Service
+@login_required
+def edit_service(request, pk):
+    service = get_object_or_404(Service, pk=pk)
+    if request.method == 'POST':
+        form = ServiceForm(request.POST, request.FILES, instance=service)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Service updated successfully!")
+            return redirect('service_list')
+    else:
+        form = ServiceForm(instance=service)
+    return render(request, 'myApp/edit_service.html', {'form': form, 'service': service})
+
+# Delete Service
+@login_required
+def delete_service(request, pk):
+    service = get_object_or_404(Service, pk=pk)
+    if request.method == 'POST':
+        service.delete()
+        messages.success(request, "Service deleted successfully!")
+        return redirect('service_list')
+    return render(request, 'myApp/delete_service.html', {'service': service})
 
 def search(request):
     query = request.POST.get('query')
@@ -404,6 +502,60 @@ def salon_details(request, salon_id):
     services = salon.services.all()  # Access related services using the related name 'salon_services'
     return render(request, 'myApp/salon_details.html', {'salon': salon, 'services': services})
 
+# Staff List
+@login_required
+def staff_list(request):
+    staff_members = Staff.objects.all()
+    return render(request, 'myApp/staff_list.html', {'staff_members': staff_members, 'username': request.session.get('username'),})
+
+# Add Staff
+@login_required
+def add_staff(request):
+    if request.method == 'POST':
+        form = StaffForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Staff added successfully!")
+            return redirect('staff_list')
+    else:
+        form = StaffForm()
+    return render(request, 'myApp/add_staff.html', {'form': form})
+
+# Edit Staff
+@login_required
+def edit_staff(request, pk):
+    staff = get_object_or_404(Staff, pk=pk)
+    if request.method == 'POST':
+        form = StaffForm(request.POST, request.FILES, instance=staff)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Staff details updated successfully!")
+            return redirect('staff_list')
+    else:
+        form = StaffForm(instance=staff)
+    return render(request, 'myApp/add_staff.html', {'form': form})
+
+# Delete Staff
+@login_required
+def delete_staff(request, pk):
+    staff = get_object_or_404(Staff, pk=pk)
+    staff.delete()
+    messages.success(request, "Staff member deleted successfully!")
+    return redirect('staff_list')
+
+def notification_view_owner(request):
+    """
+    View to display all appointments in the notification.html page.
+    """
+    # Fetch all appointments from the database
+    appointments = Appointment.objects.all()
+    return render(request, 'myApp/notifications.html', {'appointments': appointments})
+
+def add_category(request):
+    categories = Category.objects.all()
+    return render(request, 'myApp/add_category.html', {'categories': categories})
+
+
 def all_salons(request):
     # Fetch all salons, you can use pagination if needed
     salons = Salon.objects.all()
@@ -414,6 +566,30 @@ def all_services(request):
     services = Service.objects.all()
 
     return render(request, 'myApp/services_main.html', {'services': services})
+
+
+# User Profile
+@login_required
+def profile_owner(request):
+    user_id = request.session.get('user_id')
+    user = get_object_or_404(UserDetails, id=user_id)
+    return render(request, 'myApp/profile.html', {'user': user, 'username': request.session.get('username'),})
+
+
+# Edit Profile
+@login_required
+def edit_profile_owner(request):
+    user = request.user  # Get the currently logged-in user
+    if request.method == 'POST':
+        form = UserDetailsForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully!")
+            return redirect('profile')
+    else:
+        form = UserDetailsForm(instance=user)
+    return render(request, 'myApp/edit_profile.html', {'form': form})
+
 
 @login_required
 def profile_view(request):
@@ -442,7 +618,10 @@ def edit_profile(request):
     # Handle the GET request or render an edit profile form if needed
     return render(request, 'myApp/edit_profile.html', {'user': request.user})
 
+# User Logout
 def logout_view(request):
-    messages.success(request, '')  # Clear any success messages
+    # Clear the session data
+    request.session.flush()
     logout(request)
-    return redirect('home') 
+    messages.success(request, 'Successfully logged out!')
+    return redirect('login')

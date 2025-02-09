@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f7fc;
+        }
+
+        .wrapper {
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-box {
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            font-size: 30px;
+            font-weight: 700;
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .input-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-box p {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .input-box strong {
+            font-weight: 600;
+            color: #007bff;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .linkTxt {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .linkTxt a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .linkTxt a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="form-box">
+            <h2 class="title">Edit Your Profile</h2>
+            
+            <form method="POST" action="{% url 'edit_profile' %}">
+                {% csrf_token %}
+                
+                <div class="input-box">
+                    <label for="id_first_name"><strong>First Name:</strong></label>
+                    {{ form.first_name }}
+                </div>
+                
+                <div class="input-box">
+                    <label for="id_last_name"><strong>Last Name:</strong></label>
+                    {{ form.last_name }}
+                </div>
+
+                <div class="input-box">
+                    <label for="id_email"><strong>Email:</strong></label>
+                    {{ form.email }}
+                </div>
+
+                <div class="input-box">
+                    <label for="id_salon_name"><strong>Salon Name:</strong></label>
+                    {{ form.salon_name }}
+                </div>
+
+                <div class="input-box">
+                    <label for="id_phone"><strong>Phone Number:</strong></label>
+                    {{ form.phone }}
+                </div>
+
+                <div class="input-box">
+                    <label for="id_address"><strong>Address:</strong></label>
+                    {{ form.address }}
+                </div>
+
+                <div class="input-box">
+                    <label for="id_city"><strong>City:</strong></label>
+                    {{ form.city }}
+                </div>
+
+                <div class="input-box">
+                    <label for="id_state"><strong>State:</strong></label>
+                    {{ form.state }}
+                </div>
+
+                <div class="input-box">
+                    <label for="id_pin_code"><strong>Pin Code:</strong></label>
+                    {{ form.pin_code }}
+                </div>
+
+                <div class="input-box">
+                    <label for="id_country"><strong>Country:</strong></label>
+                    {{ form.country }}
+                </div>
+
+                <div class="input-box">
+                    <label for="id_gender"><strong>Gender:</strong></label>
+                    {{ form.gender }}
+                </div>
+
+                <button type="submit" class="btn">Save Changes</button>
+            </form>
+
+            <div class="linkTxt">
+                <a href="{% url 'profile' %}">Back to Profile</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+

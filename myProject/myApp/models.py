@@ -1,6 +1,7 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 
 
 class UserDetails(AbstractUser):  # Inherit from AbstractUser, not models.Model
@@ -19,9 +20,26 @@ class UserDetails(AbstractUser):  # Inherit from AbstractUser, not models.Model
 
     # Define which field to use for authentication
     USERNAME_FIELD = 'username'  # You can also change this to 'email' if you want email-based authentication
+    groups = models.ManyToManyField(Group, related_name="user_details_groups", blank=True)
+    user_permissions = models.ManyToManyField(Permission, related_name="user_details_permissions", blank=True)
 
     def __str__(self):
         return self.username  # Or you could return something more descriptive, e.g. self.email
+
+class OwnerDetails(AbstractUser):
+    salon_name = models.CharField(max_length=100, blank=True)
+    phone = models.CharField(max_length=15, blank=True)
+    gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')], blank=True)
+    address = models.CharField(max_length=255, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    pin_code = models.CharField(max_length=6, blank=True)
+    country = models.CharField(max_length=100, blank=True)
+    groups = models.ManyToManyField(Group, related_name="salon_details_groups", blank=True)
+    user_permissions = models.ManyToManyField(Permission, related_name="salon_details_permissions", blank=True)
+
+    def _str_(self):
+        return self.username
 
 class Service(models.Model):
     name = models.CharField(max_length=100)
@@ -30,6 +48,16 @@ class Service(models.Model):
     duration = models.PositiveIntegerField(default=30,help_text="Duration in minutes")
 
     def __str__(self):
+        return self.name
+
+class Staff(models.Model):
+    name = models.CharField(max_length=100)
+    position = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=15)
+    photo = models.ImageField(upload_to='staff_photos/', blank=True, null=True)
+
+    def _str_(self):
         return self.name
 
 class Salon(models.Model):
@@ -65,6 +93,7 @@ class Appointment(models.Model):
     date = models.DateField()
     slot = models.ForeignKey(BookedSlot, on_delete=models.CASCADE, null=True, blank=True) # For example, "10:00 AM"
     created_at = models.DateTimeField(default=timezone.now)
+    status = models.CharField(max_length=50, blank=True)
 
     def __str__(self):
         return f"Appointment at {self.salon.name} for {self.service.name} on {self.date} at {self.slot}"
@@ -91,3 +120,10 @@ class ServiceFeedback(models.Model):
 
     def _str_(self):
         return f"Feedback for Service ID {self.service.id} - Rating: {self.rating}"
+
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    image = models.ImageField(upload_to='categories/', null=True, blank=True)
+
+    def _str_(self):
+        return self.name

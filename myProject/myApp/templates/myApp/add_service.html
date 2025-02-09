@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salon Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+            border-radius: 8px;
+            margin: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar {
+            background-color: #eee;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px;
+        }
+
+        .navbar .profile-btn, 
+        .navbar .login-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .navbar .profile-btn:hover, 
+        .navbar .login-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .add-category-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+
+        .add-category-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Category Container - Flex Layout */
+        .category-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .category {
+            flex: 1;
+            max-width: 300px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .category h2 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .category .add-service-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .category .add-service-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .category img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .add-category-form {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .add-category-form input,
+        .add-category-form button {
+            width: calc(100% - 20px);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+        }
+
+        .add-category-form button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .add-category-form button:hover {
+            background-color: #0056b3;
+        }
+
+        .add-category-form h2 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            color: #333;
+        }
+
+        /* Service Modal */
+        .service-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .service-modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-modal input,
+        .service-modal button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .service-modal button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .service-modal button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Main Content -->
+        <main>
+            <div class="navbar">
+                <p>Welcome to your dashboard!</p>
+                <div>
+                    <a href="/profile"><button class="profile-btn">Profile</button></a>
+                    <a href="/login"><button class="login-btn">Login</button></a>
+                </div>
+            </div>
+
+            <!-- Service Management Section -->
+            <div class="content">
+                <h1>Manage Services</h1>
+
+                <!-- Add New Category Button -->
+                <button class="add-category-btn" onclick="toggleAddCategoryForm()">Add Category</button>
+
+                <!-- Add New Category Form -->
+                <div class="add-category-form" id="add-category-form">
+                    <h2>Add New Category</h2>
+                    <input type="text" id="category-name" placeholder="Category Name">
+                    <input type="file" id="category-img" accept="image/*">
+                    <button id="add-category-btn">Add Category</button>
+                </div>
+
+                <!-- Category Section -->
+                <div class="category-container" id="category-container"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Adding Service -->
+    <div class="service-modal" id="service-modal">
+        <div class="service-modal-content">
+            <h2>Add Service</h2>
+            <input type="text" id="service-name" placeholder="Service Name">
+            <input type="number" id="service-price" placeholder="Price">
+            <input type="text" id="service-time" placeholder="Time">
+            <button onclick="addService()">OK</button>
+            <button onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // Toggle Add Category Form
+        function toggleAddCategoryForm() {
+            const form = document.getElementById('add-category-form');
+            form.style.display = form.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Add Category
+        document.getElementById('add-category-btn').addEventListener('click', function () {
+            const categoryName = document.getElementById('category-name').value;
+            const categoryImg = document.getElementById('category-img').files[0];
+
+            if (categoryName && categoryImg) {
+                const reader = new FileReader();
+
+                reader.onload = function () {
+                    const newCategory = document.createElement('div');
+                    newCategory.classList.add('category');
+
+                    const categoryHeader = document.createElement('h2');
+                    categoryHeader.textContent = categoryName;
+                    newCategory.appendChild(categoryHeader);
+
+                    const categoryImgElement = document.createElement('img');
+                    categoryImgElement.src = reader.result;
+                    categoryImgElement.alt = categoryName + ' Image';
+                    newCategory.appendChild(categoryImgElement);
+
+                    const addServiceBtn = document.createElement('button');
+                    addServiceBtn.classList.add('add-service-btn');
+                    addServiceBtn.textContent = 'Add Service';
+                    addServiceBtn.onclick = () => openServiceModal();
+
+                    newCategory.appendChild(addServiceBtn);
+                    document.getElementById('category-container').appendChild(newCategory);
+
+                    document.getElementById('category-name').value = '';
+                    document.getElementById('category-img').value = '';
+                    document.getElementById('add-category-form').style.display = 'none';
+                };
+
+                reader.readAsDataURL(categoryImg);
+            } else {
+                alert('Please enter a category name and upload an image.');
+            }
+        });
+
+        // Open Modal for Adding Service
+        function openServiceModal() {
+            document.getElementById('service-modal').style.display = 'flex';
+        }
+
+        // Close Modal
+        function closeModal() {
+            document.getElementById('service-modal').style.display = 'none';
+        }
+
+        // Add Service and Display
+        function addService() {
+            const serviceName = document.getElementById('service-name').value;
+            const servicePrice = document.getElementById('service-price').value;
+            const serviceTime = document.getElementById('service-time').value;
+
+            if (serviceName && servicePrice && serviceTime) {
+                const serviceBox = document.createElement('div');
+                serviceBox.style.border = '1px solid #ddd';
+                serviceBox.style.borderRadius = '8px';
+                serviceBox.style.padding = '15px';
+                serviceBox.style.marginTop = '15px';
+                serviceBox.style.backgroundColor = '#fff';
+                serviceBox.style.textAlign = 'center';
+
+                const serviceDetails = document.createElement('p');
+                serviceDetails.textContent = `${serviceName} - $${servicePrice} - ${serviceTime} mins`;
+                serviceBox.appendChild(serviceDetails);
+
+                document.getElementById('category-container').appendChild(serviceBox);
+
+                closeModal(); // Close the modal after adding the service
+            } else {
+                alert('Please fill in all the fields.');
+            }
+        }
+    </script>
+</body>
+</html>

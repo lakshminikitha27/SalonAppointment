@@ -1,0 +1,332 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salon Owner Signup</title>
+    <style>
+        /* style.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+        }
+
+        .wrapper {
+            max-width: 400px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .form-box {
+            background-color: #fff;
+            padding: 30px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .input-box {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-box input[type="text"],
+        .input-box input[type="tel"],
+        .input-box input[type="password"],
+        .input-box input[type="email"],
+        .input-box select {
+            width: 100%;
+            padding: 12px 40px 12px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .input-box label {
+            position: absolute;
+            top: 10px;
+            left: 12px;
+            font-size: 14px;
+            color: #666;
+            transition: 0.3s;
+        }
+
+        .input-box input:focus + label,
+        .input-box input:valid + label,
+        .input-box select:focus + label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            color: #007bff;
+        }
+
+        .input-box i {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #007bff;
+            cursor: pointer;
+        }
+
+        .error {
+            font-size: 14px;
+            color: #e74c3c;
+            margin-top: 5px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .linkTxt {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .linkTxt a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .linkTxt a:hover {
+            color: #0056b3;
+        }
+
+        /* Flash Message */
+        .popup {
+            padding: 10px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .popup.error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+
+        <!-- Flash Message Container -->
+        <div id="popup" class="popup"></div>
+
+        <div class="form-box register">
+            <div class="logo-title-container">
+                <!--<div class="logo">
+                    <img src="{% static 'images/logo.jpg' %}" alt="Logo">
+                </div>-->
+                <h2 class="title">Sign Up</h2>
+            </div>
+
+            <form id="signupForm" action="{% url 'signup' %}" method="POST">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="error-list">
+                        {% for error in form.non_field_errors %}
+                            <p class="error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="form-section active" id="initial-details">
+                    <!-- Username -->
+                    <div class="input-box">
+                        <input type="text" id="username" name="username" required>
+                        <label for="username">Username</label>
+                        <i class='bx bxs-user'></i>
+                        {% if form.username.errors %}
+                            <p class="error">{{ form.username.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- First Name -->
+                    <div class="input-box">
+                        <input type="text" id="first_name" name="first_name" required>
+                        <label for="first_name">First Name</label>
+                        <i class='bx bxs-user'></i>
+                        {% if form.first_name.errors %}
+                            <p class="error">{{ form.first_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="input-box">
+                        <input type="text" id="last_name" name="last_name" required>
+                        <label for="last_name">Last Name</label>
+                        <i class='bx bxs-user'></i>
+                        {% if form.last_name.errors %}
+                            <p class="error">{{ form.last_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="input-box">
+                        <input type="tel" id="phone" name="phone" required>
+                        <label for="phone">Phone Number</label>
+                        <i class='bx bxs-phone'></i>
+                        {% if form.phone.errors %}
+                            <p class="error">{{ form.phone.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Email -->
+                    <div class="input-box">
+                        <input type="email" id="email" name="email" required>
+                        <label for="email">Email</label>
+                        <i class='bx bxs-envelope'></i>
+                        {% if form.email.errors %}
+                            <p class="error">{{ form.email.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Salon Name -->
+                    <div class="input-box">
+                        <input type="text" id="salon_name" name="salon_name" required>
+                        <label for="salon_name">Salon Name</label>
+                        <i class='bx bxs-store'></i>
+                        {% if form.salon_name.errors %}
+                            <p class="error">{{ form.salon_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="input-box">
+                        <select id="id_gender" name="gender" required>
+                            <option value="" disabled selected>Select Gender</option>
+                            <option value="Male" {% if form.gender.value == "Male" %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if form.gender.value == "Female" %}selected{% endif %}>Female</option>
+                            <option value="Other" {% if form.gender.value == "Other" %}selected{% endif %}>Other</option>
+                        </select>
+                        <label for="gender">Gender</label>
+                        {% if form.gender.errors %}
+                            <p class="error">{{ form.gender.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Address -->
+                    <div class="input-box">
+                        <input type="text" id="address" name="address" required>
+                        <label for="address">Address</label>
+                        <i class='bx bxs-map'></i>
+                        {% if form.address.errors %}
+                            <p class="error">{{ form.address.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- City -->
+                    <div class="input-box">
+                        <input type="text" id="city" name="city" required>
+                        <label for="city">City</label>
+                        <i class='bx bxs-city'></i>
+                        {% if form.city.errors %}
+                            <p class="error">{{ form.city.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- State -->
+                    <div class="input-box">
+                        <input type="text" id="state" name="state" required>
+                        <label for="state">State</label>
+                        <i class='bx bxs-map'></i>
+                        {% if form.state.errors %}
+                            <p class="error">{{ form.state.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Pin Code -->
+                    <div class="input-box">
+                        <input type="text" id="pin_code" name="pin_code" required>
+                        <label for="pin_code">Pin Code</label>
+                        <i class='bx bxs-map-pin'></i>
+                        {% if form.pin_code.errors %}
+                            <p class="error">{{ form.pin_code.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Country -->
+                    <div class="input-box">
+                        <input type="text" id="country" name="country" required>
+                        <label for="country">Country</label>
+                        <i class='bx bxs-globe'></i>
+                        {% if form.country.errors %}
+                            <p class="error">{{ form.country.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Password -->
+                    <div class="input-box">
+                        <input type="password" id="password" name="password" required>
+                        <label for="password">Password</label>
+                        <i class='bx bxs-lock-alt' id="toggle-password"></i>
+                        {% if form.password.errors %}
+                            <p class="error">{{ form.password.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="input-box">
+                        <input type="password" id="confirm-password" name="confirm_password" required>
+                        <label for="confirm-password">Confirm Password</label>
+                        <i class='bx bxs-lock-alt'></i>
+                        {% if form.confirm_password.errors %}
+                            <p class="error">{{ form.confirm_password.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn">Sign Up</button>
+                </div>
+
+                <div class="linkTxt">
+                    <p>Already have an account? <a href="{% url 'login' %}" class="register-link">Login</a></p>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+</body>
+</html>
+

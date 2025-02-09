@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Staff List{% endblock %}
+
+{% block content %}
+
+<style>
+    /* Global Styles */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 20px auto;
+        text-align: center;
+    }
+
+    h1 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px 5px;
+        font-size: 16px;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #28a745;
+    }
+
+    .btn-primary:hover {
+        background-color: #218838;
+    }
+
+    .btn-secondary {
+        background-color: #007bff;
+    }
+
+    .btn-secondary:hover {
+        background-color: #0069d9;
+    }
+
+    /* Staff List Styles */
+    .staff-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .staff-item {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: calc(33.33% - 20px);
+        max-width: 300px;
+        padding: 20px;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    .staff-item h2 {
+        font-size: 1.4rem;
+        color: #333;
+        margin: 10px 0;
+    }
+
+    .staff-item img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 3px solid #f0f0f0;
+    }
+
+    .staff-item p {
+        font-size: 1rem;
+        color: #555;
+        margin: 8px 0;
+    }
+
+    .staff-item .btn {
+        margin-top: 10px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .staff-item {
+            width: calc(50% - 20px);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .staff-item {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container">
+    <h1>Staff Members</h1>
+    
+    <!-- Staff List -->
+    <div class="staff-list">
+        {% for staff in staff_members %}
+            <div class="staff-item">
+                <h2>{{ staff.name }}</h2>
+                <!-- Staff Photo -->
+                {% if staff.photo %}
+                    <img src="{{ staff.photo.url }}" alt="Photo of {{ staff.name }}">
+                {% else %}
+                    <img src="{% static 'images/profile-placeholder.png' %}" alt="Default Profile Image">
+                {% endif %}
+                <!-- Staff Details -->
+                <p><strong>Position:</strong> {{ staff.position }}</p>
+                <p><strong>Email:</strong> {{ staff.email }}</p>
+                <p><strong>Phone:</strong> {{ staff.phone }}</p>
+                <!-- Edit and Delete Buttons -->
+                <a href="{% url 'edit_staff' staff.pk %}" class="btn btn-secondary">Edit</a>
+                <a href="{% url 'delete_staff' staff.pk %}" class="btn btn-secondary">Delete</a>
+            </div>
+        {% empty %}
+            <p>No staff members found. <a href="{% url 'add_staff' %}">Add a staff member</a> to get started!</p>
+        {% endfor %}
+    </div>
+    <!-- Add Staff Button -->
+    <a href="{% url 'add_staff' %}" class="btn btn-primary">Add Staff</a>
+</div>
+
+{% endblock %}

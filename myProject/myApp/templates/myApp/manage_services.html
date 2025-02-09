@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <title>Manage Services</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            width: 80%;
+            margin: 2rem auto;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333333;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #a71d2a;
+        }
+
+        .category-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .category-box {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .category-box img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .category-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .delete-icon {
+            color: #dc3545;
+            cursor: pointer;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .delete-icon:hover {
+            color: #a71d2a;
+        }
+
+        .add-service-icon {
+            color: #28a745;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .add-service-icon:hover {
+            color: #1e7e34;
+        }
+
+        .service-list {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 0.5rem;
+        }
+
+        .service-item {
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .service-item span {
+            font-weight: normal;
+        }
+
+        .service-item button {
+            margin-left: 0.5rem;
+            cursor: pointer;
+        }
+
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .popup-header {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .popup input {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .popup .btn {
+            width: 100%;
+        }
+    </style>
+<body>
+    <div class="container">
+        <h1>Manage Services</h1>
+
+        <!-- Add Category Button -->
+        <button class="btn" onclick="openPopup('category')">Add Category</button>
+
+        <!-- Popup Overlay -->
+        <div class="popup-overlay" id="popup-overlay"></div>
+
+        <!-- Popup Box -->
+        <div class="popup" id="popup">
+            <div class="popup-header" id="popup-header">Add Category</div>
+            <input type="text" id="popup-name" placeholder="Enter Name">
+            <div id="popup-extra-fields" style="display: none;">
+                <input type="text" id="popup-time" placeholder="Enter Time (e.g., 30 mins)">
+                <input type="text" id="popup-cost" placeholder="Enter Cost (e.g., $50)">
+            </div>
+            <input type="file" id="popup-image" style="display: none;">
+            <label id="image-upload-label" style="display: none;">
+                Upload Category Image
+                <input type="file" id="popup-category-image" accept="image/*">
+            </label>
+            <button class="btn" id="popup-submit" onclick="submitPopup()">Submit</button>
+        </div>
+
+        <!-- Categories Container -->
+        <div class="category-container" id="category-container">
+            <!-- Categories will be dynamically added here -->
+        </div>
+    </div>
+
+    <script>
+        let currentCategory = null;
+        let isAddingCategory = true;
+
+        function openPopup(type, categoryName = null) {
+            isAddingCategory = type === 'category';
+            currentCategory = categoryName;
+
+            const popupHeader = document.getElementById('popup-header');
+            const popupName = document.getElementById('popup-name');
+            const extraFields = document.getElementById('popup-extra-fields');
+            const imageUploadLabel = document.getElementById('image-upload-label');
+
+            popupHeader.innerText = isAddingCategory ? 'Add Category' : Add Service to ${categoryName};
+            popupName.value = '';
+            popupName.placeholder = isAddingCategory ? 'Category Name' : 'Service Name';
+
+            extraFields.style.display = isAddingCategory ? 'none' : 'block';
+            imageUploadLabel.style.display = isAddingCategory ? 'block' : 'none';
+
+            document.getElementById('popup').style.display = 'block';
+            document.getElementById('popup-overlay').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('popup-overlay').style.display = 'none';
+        }
+
+        function submitPopup() {
+            const nameValue = document.getElementById('popup-name').value;
+
+            if (nameValue.trim() === '') {
+                alert('Please enter a valid name.');
+                return;
+            }
+
+            if (isAddingCategory) {
+                const imageInput = document.getElementById('popup-category-image');
+                const imageFile = imageInput.files[0];
+                const imageURL = imageFile ? URL.createObjectURL(imageFile) : '';
+                addCategory(nameValue, imageURL);
+            } else {
+                const timeValue = document.getElementById('popup-time').value;
+                const costValue = document.getElementById('popup-cost').value;
+
+                if (timeValue.trim() === '' || costValue.trim() === '') {
+                    alert('Please fill in all fields for the service.');
+                    return;
+                }
+
+                addService(currentCategory, nameValue, timeValue, costValue);
+            }
+
+            closePopup();
+        }
+
+        function addCategory(categoryName, imageURL) {
+            const container = document.getElementById('category-container');
+
+            const categoryBox = document.createElement('div');
+            categoryBox.className = 'category-box';
+
+            const categoryImage = imageURL ? <img src="${imageURL}" alt="Category Image"> : '';
+
+            categoryBox.innerHTML = `
+                ${categoryImage}
+                <div class="category-title">${categoryName}
+                    <span class="delete-icon" onclick="deleteCategory(this)">&times;</span>
+                </div>
+                <button class="btn add-service-icon" onclick="openPopup('service', '${categoryName}')">Add Service</button>
+                <ul class="service-list" id="${categoryName}-services"></ul>
+            `;
+
+            container.appendChild(categoryBox);
+        }
+
+        function deleteCategory(element) {
+            const categoryBox = element.closest('.category-box');
+            categoryBox.remove();
+        }
+
+        function addService(categoryName, serviceName, serviceTime, serviceCost) {
+            const serviceList = document.getElementById(${categoryName}-services);
+            const newService = document.createElement('li');
+            newService.className = 'service-item';
+            newService.innerHTML = `
+                <span>${serviceName} - ${serviceTime} - ${serviceCost}</span>
+                <div>
+                    <button class="btn btn-warning" onclick="editService('${categoryName}', '${serviceName}')">Edit</button>
+                    <button class="btn btn-danger" onclick="deleteService('${categoryName}', '${serviceName}')">&times;</button>
+                </div>
+            `;
+            serviceList.appendChild(newService);
+        }
+
+        function editService(categoryName, serviceName) {
+            const serviceList = document.getElementById(${categoryName}-services);
+            const serviceItems = serviceList.getElementsByClassName('service-item');
+            for (let service of serviceItems) {
+                const span = service.querySelector('span');
+                if (span && span.textContent.includes(serviceName)) {
+                    const [name, time, cost] = span.textContent.split(' - ');
+                    openPopup('service', categoryName);
+                    document.getElementById('popup-name').value = name;
+                    document.getElementById('popup-time').value = time;
+                    document.getElementById('popup-cost').value = cost;
+                    break;
+                }
+            }
+        }
+
+        function deleteService(categoryName, serviceName) {
+            const serviceList = document.getElementById(${categoryName}-services);
+            const serviceItems = serviceList.getElementsByClassName('service-item');
+            for (let service of serviceItems) {
+                const span = service.querySelector('span');
+                if (span && span.textContent.includes(serviceName)) {
+                    service.remove();
+                    break;
+                }
+            }
+        }
+
+        document.getElementById('popup-overlay').onclick = closePopup;
+    </script>
+
+{% endblock %}

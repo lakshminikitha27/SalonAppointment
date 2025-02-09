@@ -8,8 +8,8 @@ from . import views
 
 
 urlpatterns = [
-    path('home/', views.home, name='home'),
-    path('register/', views.register, name='register'),
+    path('home/', views.home_customer, name='home'),
+    path('register/', views.register_customer, name='register'),
     path('login/', views.login_view, name='login'),
     path('search/', views.search, name='search'),
     path('salons/', views.all_salons, name='all_salons'),
@@ -30,4 +30,26 @@ urlpatterns = [
     path('services/<str:service_name>/', views.service_detail, name='service_detail'),
     path('feedback/<int:appointment_id>/', views.give_feedback, name='give_feedback'),
     path('get-booked-slots/<int:salon_id>/<int:service_id>/', views.get_booked_slots, name='get_booked_slots'),
+    path('signup/', views.register_owner, name='signup'),
+    path('home/', views.home_owner, name='home'),
+    path('logout/', views.logout_view, name='logout'),
+    #path('service_list/', views.service_list, name='service_list'),
+    path('edit_service/<int:pk>/', views.edit_service, name='edit_service'),
+    path('delete_service/<int:pk>/', views.delete_service, name='delete_service'),
+
+    path('profile/', views.profile_owner, name='profile'),
+    path('edit_profile/', views.edit_profile_owner, name='edit_profile'),
+
+    path('staff_list/', views.staff_list, name='staff_list'),
+    path('add_staff/', views.add_staff, name='add_staff'),
+    path('edit_staff/<int:pk>/', views.edit_staff, name='edit_staff'),
+    path('delete_staff/<int:pk>/', views.delete_staff, name='delete_staff'),
+
+    path('notifications/', views.notification_view_owner, name='notifications'),
+    #path('service_list/add_category/', views.add_category, name='add_category'),
+    path('add_service/', views.add_service, name='add_service'),
+    path('add_category/', views.add_category, name='add_category'),
+    path('manage_services/', views.manage_services, name='manage_services'),
+    #path('delete_category/<int:category_id>/', views.delete_category, name='delete_category'),
+    path('delete_service/<int:service_id>/', views.delete_service, name='delete_service'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

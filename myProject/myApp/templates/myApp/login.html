@@ -45,6 +45,25 @@
                     <i class='bx bxs-lock-alt' id="toggle-password"></i>
                 </div>
                 
+                <div class="form-section" id="additional-details">
+                    <div class="input-box" style="display: flex; align-items: center; gap: 15px;">
+                        <label for="role">Role</label>
+                        <div style="display: flex; gap: 10px;">
+                            <div style="margin-left: 100px;">
+                                <input type="radio" id="user" name="role" value="User" required>
+                                <label for="user" style="margin-left: 120px;">User</label>
+                            </div>
+                            <div style="margin-left: 100px;">
+                                <input type="radio" id="owner" name="role" value="Owner" required>
+                                <label for="owner" style="margin-left: 240px;">Owner</label>
+                            </div>
+                            {% if form.gender.errors %}
+                                <p class="error">{{ form.gender.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
                 <button type="submit" class="btn animation" style="--i:3; --j:24">Login</button>
                 <div class="linkTxt animation" style="--i:5; --j:25">
                     <p>Don't have an account? <a href="{% url 'register' %}" class="register-link">Sign Up</a></p>

@@ -1,0 +1,248 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Service</title>
+    <style>
+        /* Navbar Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc;
+        }
+
+        .navbar {
+            background-color: #1a1a2e;
+            color: #fff;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #f8f9fa;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .navbar .logo:hover {
+            color: #00bcd4;
+        }
+
+        .navbar .menu {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar .menu li {
+            margin: 0 15px;
+        }
+
+        .navbar .menu li a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .navbar .menu li a:hover {
+            background-color: #00bcd4;
+            color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 188, 212, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 10px 20px;
+            }
+
+            .navbar .logo {
+                margin-bottom: 15px;
+                font-size: 20px;
+            }
+
+            .navbar .menu {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .navbar .menu li {
+                margin: 10px 0;
+                text-align: left;
+            }
+
+            .navbar .menu li a {
+                font-size: 14px;
+                padding: 10px;
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        /* Form Styles */
+        .container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 500px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin: 2rem auto;
+            overflow: hidden;
+        }
+
+        .container h1 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .form-group label {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="file"],
+        .form-group input[type="number"],
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            background-color: #edf2f7;
+            color: #1a202c;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #3182ce;
+            outline: none;
+            background-color: #ffffff;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .form-group img {
+            margin-top: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .btn {
+            background-color: #3182ce;
+            color: #ffffff;
+            font-size: 1rem;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #2b6cb0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.6);
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 1.2rem;
+            }
+
+            .container h1 {
+                font-size: 1.5rem;
+            }
+
+            .btn {
+                padding: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a href="/" class="logo">My App</a>
+        <ul class="menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/service_list/">Service</a></li>
+            <li><a href="/staff_list/">Staff</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="/profile/">Hello, {{ username }}</a></li>
+                <li><a href="/logout/">Logout</a></li>
+            {% else %}
+                <li><a href="/login/">Login</a></li>
+                <li><a href="/signup/">Signup</a></li>
+            {% endif %}
+        </ul>
+    </header>
+    <main>
+        <div class="container">
+            <h1>Edit Service</h1>
+            <form method="post" enctype="multipart/form-data" action="{% url 'edit_service' service.pk %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_name">Service Name</label>
+                    <input type="text" id="id_name" name="name" value="{{ service.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_image">Service Image</label>
+                    <input type="file" id="id_image" name="image" accept="image/*">
+                    {% if service.image %}
+                        <p>Current Image: <img src="{{ service.image.url }}" alt="Service Image" width="100"></p>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="id_time_required">Time Required</label>
+                    <input type="text" id="id_time_required" name="time_required" value="{{ service.time_required }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_description">Description</label>
+                    <textarea id="id_description" name="description" rows="4" required>{{ service.description }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="id_price">Price</label>
+                    <input type="number" id="id_price" name="price" step="0.01" value="{{ service.price }}" required>
+                </div>
+                <button type="submit" class="btn">Update Service</button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>

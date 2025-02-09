@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appointment Notifications</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 20px;
+    }
+
+    .notification-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 16px;
+    }
+
+    .notification-table thead {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    .notification-table thead th {
+      padding: 12px 8px;
+      text-align: left;
+    }
+
+    .notification-table tbody tr {
+      transition: background-color 0.3s;
+    }
+
+    .notification-table tbody tr:nth-child(even) {
+      background-color: #f3f3f3;
+    }
+
+    .notification-table tbody tr:hover {
+      background-color: #f0f8ff;
+    }
+
+    .notification-table td, .notification-table th {
+      padding: 12px 8px;
+      border: 1px solid #ddd;
+    }
+
+    .notification-table tbody td {
+      vertical-align: middle;
+    }
+
+    .notification-table tbody .status {
+      font-weight: bold;
+      text-align: center;
+    }
+
+    /* Status Colors */
+    .status.pending {
+      color: #ff9800;
+    }
+
+    .status.completed {
+      color: #4caf50;
+    }
+
+    .status.cancelled {
+      color: #f44336;
+    }
+
+    @media (max-width: 768px) {
+      .notification-table thead {
+        display: none;
+      }
+
+      .notification-table tbody tr {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+        border-bottom: 2px solid #ddd;
+      }
+
+      .notification-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px;
+      }
+
+      .notification-table tbody td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        margin-right: 10px;
+        color: #555;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Appointment Notifications</h1>
+    <table class="notification-table">
+      <thead>
+        <tr>
+          <th>Person Name</th>
+          <th>Time Slot</th>
+          <th>Category</th>
+          <th>Service Name</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for appointment in appointments %}
+        <tr>
+          <td data-label="Person Name">{{ appointment.person_name }}</td>
+          <td data-label="Time Slot">{{ appointment.time_slot }}</td>
+          <td data-label="Category">{{ appointment.category }}</td>
+          <td data-label="Service Name">{{ appointment.service_name }}</td>
+          <td data-label="Status" class="status {{ appointment.status|lower }}">{{ appointment.status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+
+{% endblock %}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Service</title>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Container styling */
+        .container {
+            background-color: #fff;
+            width: 90%;
+            max-width: 500px;
+            padding: 2rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        /* Heading styling */
+        .container h1 {
+            font-size: 1.8rem;
+            color: #d9534f; /* Red color for delete warning */
+            margin-bottom: 1.5rem;
+        }
+
+        /* Service details styling */
+        .service-details {
+            margin-bottom: 1.5rem;
+            color: #555;
+        }
+
+        /* Button styling */
+        .btn-container {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #fff;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-delete {
+            background-color: #d9534f;
+        }
+
+        .btn-delete:hover {
+            background-color: #c9302c;
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+        }
+
+        .btn-cancel:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Delete Service</h1>
+        <p class="service-details">Are you sure you want to delete the following service?</p>
+
+        <!-- Display service details -->
+        <div class="service-details">
+            <p><strong>Service Name:</strong> {{ service.name }}</p>
+            <p><strong>Time Required:</strong> {{ service.time_required }}</p>
+            <p><strong>Description:</strong> {{ service.description }}</p>
+            <p><strong>Price:</strong> ${{ service.price }}</p>
+        </div>
+
+        <!-- Form to confirm deletion -->
+        <form method="post">
+            {% csrf_token %}
+            <div class="btn-container">
+                <!-- Submit button to confirm deletion -->
+                <button type="submit" class="btn btn-delete">Delete</button>
+                <!-- Cancel button to go back to the service list -->
+                <a href="{% url 'service_list' %}" class="btn btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
