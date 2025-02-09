@@ -8,8 +8,10 @@ from . import views
 
 
 urlpatterns = [
-    path('home/', views.home_customer, name='home'),
-    path('register/', views.register_customer, name='register'),
+    path('home/customer/', views.home_customer, name='home_customer'), 
+    path('home_owner/', views.home_owner, name='home_owner'),
+    path('register_customer/', views.register_customer, name='register_customer'),
+    path('register_owner/', views.register_owner, name='register_owner'),
     path('', views.landing_page, name='landing_page'),
     path('login/customer/', views.login_view_customer, name='login_view_customer'),
     path('login/owner/', views.login_view_owner, name='login_view_owner'),
@@ -17,8 +19,8 @@ urlpatterns = [
     path('salons/', views.all_salons, name='all_salons'),
     path('services/', views.all_services, name='all_services'), 
     path('services/', views.service_detail, name='Services'),
-    path('profile/', views.profile_view, name='profile'),
-    path('profile/edit/', views.edit_profile, name='edit_profile'), 
+    path('profile_customer/', views.profile_view, name='profile_customer'),
+    path('profile_customer/edit_customer/', views.edit_profile, name='edit_profile_customer'), 
     path('select_salon_service/<int:salon_id>/<int:service_id>/', views.select_salon_service, name='select_salon_service'),
     path('book/<int:salon_id>/<int:service_id>/', views.book_appointment, name='book_appointment'),
     path('payment/', views.payment, name='payment'),
@@ -33,14 +35,13 @@ urlpatterns = [
     path('feedback/<int:appointment_id>/', views.give_feedback, name='give_feedback'),
     path('get-booked-slots/<int:salon_id>/<int:service_id>/', views.get_booked_slots, name='get_booked_slots'),
     path('signup/', views.register_owner, name='signup'),
-    path('home/', views.home_owner, name='home'),
     path('logout/', views.logout_view, name='logout'),
     #path('service_list/', views.service_list, name='service_list'),
     path('edit_service/<int:pk>/', views.edit_service, name='edit_service'),
     path('delete_service/<int:pk>/', views.delete_service, name='delete_service'),
 
-    path('profile/', views.profile_owner, name='profile'),
-    path('edit_profile/', views.edit_profile_owner, name='edit_profile'),
+    path('profile_owner/', views.profile_owner, name='profile_owner'),
+    path('edit_profile_owner/', views.edit_profile_owner, name='edit_profile_owner'),
 
     path('staff_list/', views.staff_list, name='staff_list'),
     path('add_staff/', views.add_staff, name='add_staff'),
@@ -48,7 +49,8 @@ urlpatterns = [
     path('delete_staff/<int:pk>/', views.delete_staff, name='delete_staff'),
 
     path('notifications/', views.notification_view_owner, name='notifications'),
-    #path('service_list/add_category/', views.add_category, name='add_category'),
+    path('service_list/', views.service_list, name='service_list'),
+    path('service_list/add_category/', views.add_category, name='add_category'),
     path('add_service/', views.add_service, name='add_service'),
     path('add_category/', views.add_category, name='add_category'),
     path('manage_services/', views.manage_services, name='manage_services'),

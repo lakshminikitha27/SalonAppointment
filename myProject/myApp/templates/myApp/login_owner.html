@@ -2,7 +2,7 @@
 
 {% block content %}
     <title>Salon Owner Login</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'login_owner.css' %}">
 
     <div class="form-container">
         <h2>Salon Owner Login</h2>
@@ -19,6 +19,6 @@
             {% endfor %}
         </div>
         {% endif %}
-        <p>Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>
+        <p>Don't have an account? <a href="{% url 'register_owner' %}">Sign up</a></p>
     </div>
 {% endblock %}

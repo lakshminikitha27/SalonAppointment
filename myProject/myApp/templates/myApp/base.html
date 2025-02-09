@@ -42,18 +42,18 @@
                         <button type="submit">Search</button>
                     </form>
                 </li>
-                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'home_customer' %}">Home</a></li>
                 <li><a href="{% url 'all_services' %}">Services</a></li>
                 <li><a href="{% url 'all_salons' %}">Salons</a></li>
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'profile' %}">Hello, {{ user.username }}</a></li>
+                    <li><a href="{% url 'profile_customer' %}">Hello, {{ user.username }}</a></li>
                     <form action="{% url 'logout' %}" method="post">
                         {% csrf_token %}
                         <button type="submit">Logout</button>  <!-- Logout button -->
                     </form>
                 {% else %}
-                    <li><a href="{% url 'login' %}">Login</a></li>
-                    <li><a href="{% url 'register' %}">Signup</a></li>
+                    <li><a href="{% url 'login_view_customer' %}">Login</a></li>
+                    <li><a href="{% url 'register_customer' %}">Signup</a></li>
                 {% endif %}
             </ul>
         </nav>

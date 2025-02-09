@@ -17,6 +17,8 @@ from math import radians, sin, cos, sqrt, atan2
 from geopy.geocoders import Nominatim
 from django.http import HttpResponse
 from django.http import JsonResponse
+from django.contrib.auth.hashers import check_password
+from django.views.decorators.csrf import csrf_exempt
 
 def base_view(request):
     cart_count = request.session.get('cart_count', 0)
@@ -39,7 +41,7 @@ def register_customer(request):
             user_details = form.save(commit=False)
             user_details.password = make_password(form.cleaned_data['password'])
             user_details.save()
-            return redirect('login')  # redirect to home or dashboard
+            return redirect('login_view_customer')  # redirect to home or dashboard
         else:
             messages.error(request, "There were errors in your form. Please check and try again.")
             return render(request, "myApp/register.html", {"form": form})
@@ -56,7 +58,7 @@ def register_owner(request):
             pasword.password = make_password(form.cleaned_data['password'])
             pasword.save()
             messages.success(request, "Account created successfully! Please log in.")
-            return redirect('login')  # Redirect to login page
+            return redirect('login_view_owner')  # Redirect to login page
         else:
             messages.error(request, "There were errors in your form. Please try again.")
     else:
@@ -67,6 +69,7 @@ def landing_page(request):
     """Landing page with User and Owner selection buttons."""
     return render(request, 'myApp/landing.html')
 
+@csrf_exempt
 def login_view_customer(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -76,35 +79,29 @@ def login_view_customer(request):
         if user is not None:
             login(request, user)
             messages.success(request, 'Successfully logged in!')
-            return redirect('home')
+            return redirect('home_customer')
         else:
             messages.error(request, 'Invalid username or password')
 
     return render(request, 'myApp/login_customer.html')
 
-# User Login
 def login_view_owner(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            request.session['user_id'] = user.id
-            request.session['username'] = user.username
-            request.session['user_role'] = "staff" if user.is_staff else "customer"
-            request.session['last_login_time'] = str(user.last_login)
-            
-            # Track user activity
-            user_activity = request.session.get('user_activity', [])
-            user_activity.append(f"Logged in at {str(user.last_login)}")
-            request.session['user_activity'] = user_activity
+        print(f'Owner Username: {username}, Password: {password}')
 
-            messages.success(request, 'Successfully logged in!')
-            return redirect('home_owner')
-        else:
+        try:
+            owner = OwnerDetails.objects.get(username=username)  # Fetch owner by username
+            if check_password(password, owner.password):  # Check hashed password
+                request.session['owner_id'] = owner.id  # Store owner ID in session
+                messages.success(request, 'Successfully logged in as Owner!')
+                return redirect('home_owner')  # Redirect to owner's dashboard
+            else:
+                messages.error(request, 'Invalid username or password')
+        except OwnerDetails.DoesNotExist:
             messages.error(request, 'Invalid username or password')
-    
+
     return render(request, 'myApp/login_owner.html')
 
 
@@ -125,12 +122,12 @@ def home_customer(request):
     user_lon = request.GET.get('lon')
 
     if not user_lat or not user_lon:
-        return render(request, 'myApp/home.html', {'nearby_salons': []})  # No user location data
+        return render(request, 'myApp/home_customer.html', {'nearby_salons': []})  # No user location data
 
     try:
         user_lat, user_lon = float(user_lat), float(user_lon)
     except ValueError:
-        return render(request, 'myApp/home.html', {'nearby_salons': []})
+        return render(request, 'myApp/home_customer.html', {'nearby_salons': []})
 
     salons = Salon.objects.values('id', 'name', 'rating', 'image_name', 'address', 'latitude', 'longitude')
     print(f"Found {len(salons)} salons.")  # Fetch addresses
@@ -154,12 +151,12 @@ def home_customer(request):
     nearby_salons = sorted(nearby_salons, key=lambda x: x['distance'])[:3]  # Limit to 3 nearest salons
     services = Service.objects.all()
 
-    return render(request, 'myApp/home.html', {'nearby_salons': nearby_salons, 'services': services})
+    return render(request, 'myApp/home_customer.html', {'nearby_salons': nearby_salons, 'services': services})
 
 # Home Page
 def home_owner(request):
     username = request.session.get('username')  # Default to 'Guest' if no session data
-    return render(request, 'myApp/home.html', {'username': username})
+    return render(request, 'myApp/home_owner.html', {'username': username})
 
 # Service List
 @login_required
@@ -225,6 +222,20 @@ def delete_service(request, pk):
         messages.success(request, "Service deleted successfully!")
         return redirect('service_list')
     return render(request, 'myApp/delete_service.html', {'service': service})
+
+# Service List
+@login_required
+def service_list(request):
+    if 'username' not in request.session:
+        messages.error(request, 'Your session has expired. Please log in again.')
+        return redirect('login')
+
+    services = Service.objects.all()
+    return render(request, 'myApp/service_list.html', {
+        'services': services,
+        'username': request.session.get('username'),
+    })
+
 
 def search(request):
     query = request.POST.get('query')

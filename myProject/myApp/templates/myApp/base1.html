@@ -1,0 +1,145 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My App{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style_owner.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #1a1a2e; /* Darker background with a subtle blue tint */
+            color: #fff;
+            padding: 15px 30px; /* Increased padding for better spacing */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Added shadow for depth */
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar .logo {
+            font-size: 24px; /* Slightly larger font size */
+            font-weight: 700; /* Bold text for emphasis */
+            color: #f8f9fa; /* Light gray for better contrast */
+            text-decoration: none;
+            transition: color 0.3s ease; /* Smooth color transition on hover */
+        }
+
+        .navbar .logo:hover {
+            color: #00bcd4; /* Accent color on hover */
+        }
+
+        .navbar .menu {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar .menu li {
+            margin: 0 15px; /* Even spacing between items */
+        }
+
+        .navbar .menu li a {
+            color: #e0e0e0; /* Slightly lighter gray for better visibility */
+            text-decoration: none;
+            font-size: 16px; /* Modern font size */
+            font-weight: 500; /* Slightly bold text for clarity */
+            padding: 8px 15px; /* Added padding for button-like appearance */
+            border-radius: 20px; /* Rounded edges for buttons */
+            background: transparent; /* No background by default */
+            transition: all 0.3s ease; /* Smooth transitions for all hover effects */
+        }
+
+        .navbar .menu li a:hover {
+            background-color: #00bcd4; /* Bright accent background color */
+            color: #fff; /* White text for contrast */
+            box-shadow: 0 4px 6px rgba(0, 188, 212, 0.3); /* Subtle shadow on hover */
+        }
+
+        .content {
+            padding: 30px; /* More space around content */
+            font-size: 18px; /* Larger, readable text */
+            line-height: 1.6; /* Improved line spacing for readability */
+        }
+
+        /* Media Queries for Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column; /* Stack the navbar items vertically */
+                align-items: flex-start;
+                padding: 10px 20px; /* Adjust padding for smaller screens */
+            }
+
+            .navbar .logo {
+                margin-bottom: 15px; /* Add space between the logo and menu */
+                font-size: 20px; /* Slightly smaller font size */
+            }
+
+            .navbar .menu {
+                flex-direction: column; /* Stack menu items vertically */
+                width: 100%; /* Take full width */
+            }
+
+            .navbar .menu li {
+                margin: 10px 0; /* Add space between items */
+                text-align: left; /* Align items to the left */
+            }
+
+            .navbar .menu li a {
+                font-size: 14px; /* Slightly smaller font size for mobile */
+                padding: 10px; /* Adjust padding */
+                width: 100%; /* Buttons take full width */
+                text-align: center; /* Center the text inside buttons */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar .logo {
+                font-size: 18px; /* Smaller font for extra small screens */
+            }
+
+            .navbar .menu li a {
+                font-size: 12px; /* Even smaller font for compact layout */
+                padding: 8px; /* Reduce padding for smaller buttons */
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <a href="/" class="logo">My App</a>
+        <ul class="menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="{% url 'service_list' %}">Service</a></li>
+            <li><a href="{% url 'staff_list' %}">Staff</a></li>
+          
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'profile_owner' %}">Hello, {{ username }}</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login_view_owner' %}">Login</a></li>
+                <li><a href="{% url 'register_owner' %}">Signup</a></li>
+              
+            {% endif %}
+            <li> <a href="{% url 'notifications' %}" class="notification-link">
+                🔔
+            </a></li>
+        </ul>
+    </header>
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
