@@ -63,32 +63,50 @@ def register_owner(request):
         form = OwnerDetailsForm()
     return render(request, "myApp/signup.html", {"form": form})
 
-def login_view(request):
+def landing_page(request):
+    """Landing page with User and Owner selection buttons."""
+    return render(request, 'myApp/landing.html')
+
+def login_view_customer(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        role = request.POST.get('role')  # Get selected role
-
+        print(f'Username: {username}, Password: {password}')
         user = authenticate(request, username=username, password=password)
-
         if user is not None:
-            # Check role in respective tables
-            if role == "User" and UserDetails.objects.filter(user=user).exists():
-                login(request, user)
-                messages.success(request, 'Successfully logged in as User!')
-                return redirect('user_dashboard')  # Replace with actual dashboard
-
-            elif role == "Owner" and OwnerDetails.objects.filter(user=user).exists():
-                login(request, user)
-                messages.success(request, 'Successfully logged in as Owner!')
-                return redirect('owner_dashboard')  # Replace with actual dashboard
-
-            else:
-                messages.error(request, 'Invalid role selection or user does not exist in the selected category.')
+            login(request, user)
+            messages.success(request, 'Successfully logged in!')
+            return redirect('home')
         else:
             messages.error(request, 'Invalid username or password')
 
-    return render(request, 'myApp/login.html')
+    return render(request, 'myApp/login_customer.html')
+
+# User Login
+def login_view_owner(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            request.session['user_id'] = user.id
+            request.session['username'] = user.username
+            request.session['user_role'] = "staff" if user.is_staff else "customer"
+            request.session['last_login_time'] = str(user.last_login)
+            
+            # Track user activity
+            user_activity = request.session.get('user_activity', [])
+            user_activity.append(f"Logged in at {str(user.last_login)}")
+            request.session['user_activity'] = user_activity
+
+            messages.success(request, 'Successfully logged in!')
+            return redirect('home_owner')
+        else:
+            messages.error(request, 'Invalid username or password')
+    
+    return render(request, 'myApp/login_owner.html')
+
 
 from geopy.exc import GeocoderTimedOut
 import time  # Import time for retry delays

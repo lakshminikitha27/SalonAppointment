@@ -6,7 +6,7 @@
 
     <div class="form-container">
         <h2>Salon Owner Login</h2>
-        <form method="post" action="{% url 'login' %}">
+        <form method="post" action="{% url 'login_view_owner' %}">
             {% csrf_token %}
             <input type="text" name="username" placeholder="Username" required>
             <input type="password" name="password" placeholder="Password" required>

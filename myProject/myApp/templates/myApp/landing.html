@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome | SS ENTERPRISES</title>
+
+    <!-- Boxicons CDN -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'landing.css' %}">
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f4f4f4;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .button-container button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s ease-in-out;
+        }
+
+        .user-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .owner-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .button-container button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Welcome to SS ENTERPRISES</h1>
+        <p>Select your role to continue</p>
+        <div class="button-container">
+            <button class="user-btn" onclick="window.location.href='{% url 'login_view_customer' %}'">User</button>
+            <button class="owner-btn" onclick="window.location.href='{% url 'login_view_owner' %}'">Owner</button>
+        </div>
+    </div>
+
+</body>
+</html>
