@@ -144,7 +144,7 @@ def home_customer(request):
         
         if lat is not None and lon is not None:
             distance = calculate_distance(user_lat, user_lon, lat, lon)
-            if distance <= 10:  # Show salons within 10 km
+            if distance <= 40:  # Show salons within 10 km
                 salon['distance'] = round(distance, 2)
                 nearby_salons.append(salon)
 
