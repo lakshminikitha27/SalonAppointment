@@ -13,62 +13,147 @@
     <link rel="stylesheet" href="{% static 'landing.css' %}">
 
     <style>
+        /* Global Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Full Page Styling */
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: #f4f4f4;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        .container {
             text-align: center;
-            background: white;
-            padding: 40px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            overflow: hidden;
         }
 
-        h1 {
+        /* Floating Title */
+        .title {
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
             margin-bottom: 20px;
+            animation: fadeInDown 1s ease-in-out;
         }
 
+        /* Glassmorphism Container */
+        .container {
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 50px 40px;
+            border-radius: 12px;
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-width: 400px;
+            width: 90%;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* Subtext */
+        p {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 25px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Button Container */
         .button-container {
             display: flex;
-            justify-content: center;
-            gap: 20px;
+            flex-direction: column;
+            gap: 15px;
         }
 
+        /* Buttons */
         .button-container button {
-            padding: 15px 30px;
+            padding: 15px;
             font-size: 18px;
+            font-weight: bold;
             border: none;
+            border-radius: 8px;
             cursor: pointer;
-            border-radius: 5px;
-            transition: 0.3s ease-in-out;
+            transition: all 0.3s ease-in-out;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
         }
 
+        /* User Button */
         .user-btn {
-            background-color: #007bff;
+            background: linear-gradient(135deg, #007bff, #0056b3);
             color: white;
+            box-shadow: 0px 5px 15px rgba(0, 123, 255, 0.4);
         }
 
+        .user-btn:hover {
+            box-shadow: 0px 0px 20px rgba(0, 123, 255, 0.8);
+        }
+
+        /* Owner Button */
         .owner-btn {
-            background-color: #28a745;
+            background: linear-gradient(135deg, #28a745, #1e7e34);
             color: white;
+            box-shadow: 0px 5px 15px rgba(40, 167, 69, 0.4);
         }
 
-        .button-container button:hover {
-            opacity: 0.8;
+        .owner-btn:hover {
+            box-shadow: 0px 0px 20px rgba(40, 167, 69, 0.8);
+        }
+
+        /* Fade-in Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .title {
+                font-size: 28px;
+            }
+
+            .container {
+                padding: 30px 20px;
+            }
+
+            .button-container button {
+                font-size: 16px;
+            }
         }
     </style>
 </head>
 <body>
 
+    <h1 class="title">Welcome to SS ENTERPRISES</h1>
+    
     <div class="container">
-        <h1>Welcome to SS ENTERPRISES</h1>
         <p>Select your role to continue</p>
         <div class="button-container">
             <button class="user-btn" onclick="window.location.href='{% url 'login_view_customer' %}'">User</button>
