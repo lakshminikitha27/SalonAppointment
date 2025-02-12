@@ -164,9 +164,8 @@ def home_customer(request):
                 continue  # Skip this salon if we cannot get the location
 
         distance = calculate_distance(user_lat, user_lon, lat, lon)
-        if distance <= 40:  # Show salons within 10 km
-            salon['distance'] = round(distance, 2)
-            nearby_salons.append(salon)
+        salon['distance'] = round(distance, 2)
+        nearby_salons.append(salon)
 
     nearby_salons = sorted(nearby_salons, key=lambda x: x['distance'])[:3]  # Limit to 3 nearest salons
     services = Service.objects.all()
