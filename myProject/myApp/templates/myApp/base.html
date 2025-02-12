@@ -46,11 +46,8 @@
                 <li><a href="{% url 'all_services' %}">Services</a></li>
                 <li><a href="{% url 'all_salons' %}">Salons</a></li>
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'profile_customer' %}">Hello, {{ user.username }}</a></li>
-                    <form action="{% url 'logout' %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit">Logout</button>  <!-- Logout button -->
-                    </form>
+                    <li><a href="{% url 'profile_view' %}">Hello, {{ user.username }}</a></li>
+                    <li><a href="{% url 'logout_view_customer' %}">Logout</a></li>
                 {% else %}
                     <li><a href="{% url 'login_view_customer' %}">Login</a></li>
                     <li><a href="{% url 'register_customer' %}">Signup</a></li>

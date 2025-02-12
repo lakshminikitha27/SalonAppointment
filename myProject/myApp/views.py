@@ -107,6 +107,21 @@ def login_view_owner(request):
 
 from geopy.exc import GeocoderTimedOut
 import time  # Import time for retry delays
+from geopy.geocoders import Nominatim
+
+geolocator = Nominatim(user_agent="mySalonApp")
+
+def get_lat_lon_from_address(address):
+    """Fetch latitude and longitude from an address using OpenStreetMap's Nominatim API."""
+    try:
+        location = geolocator.geocode(address, timeout=10)  # Timeout after 10 seconds
+        if location:
+            return location.latitude, location.longitude
+    except GeocoderTimedOut:
+        print(f"Geocoder timed out for address: {address}")
+    except Exception as e:
+        print(f"Error fetching lat/lon for {address}: {e}")
+    return None, None  # Return None if geolocation fails
 
 def calculate_distance(lat1, lon1, lat2, lon2):
     """ Haversine formula to calculate the distance between two latitude/longitude points. """
@@ -136,17 +151,22 @@ def home_customer(request):
 
     nearby_salons = []
     for salon in salons:
-        print(f"Salon: {salon['name']}, Address: {salon['address']}")
-        
-        # Use latitude and longitude from the database
-        lat = salon['latitude']
-        lon = salon['longitude']
-        
-        if lat is not None and lon is not None:
-            distance = calculate_distance(user_lat, user_lon, lat, lon)
-            if distance <= 10:  # Show salons within 10 km
-                salon['distance'] = round(distance, 2)
-                nearby_salons.append(salon)
+        address = salon["address"]
+        lat = salon.get("latitude")
+        lon = salon.get("longitude")
+
+        if lat is None or lon is None:  # If lat/lon is missing, fetch it
+            lat, lon = get_lat_lon_from_address(address)
+            if lat and lon:
+                salon["latitude"] = lat
+                salon["longitude"] = lon
+            else:
+                continue  # Skip this salon if we cannot get the location
+
+        distance = calculate_distance(user_lat, user_lon, lat, lon)
+        if distance <= 40:  # Show salons within 10 km
+            salon['distance'] = round(distance, 2)
+            nearby_salons.append(salon)
 
     nearby_salons = sorted(nearby_salons, key=lambda x: x['distance'])[:3]  # Limit to 3 nearest salons
     services = Service.objects.all()
@@ -642,13 +662,20 @@ def edit_profile(request):
         user.save()
 
         # Redirect to the profile page after saving
-        return redirect('profile')
+        return redirect('profile_view')
 
     # Handle the GET request or render an edit profile form if needed
     return render(request, 'myApp/edit_profile.html', {'user': request.user})
 
 # User Logout
-def logout_view(request):
+def logout_view_customer(request):
+    # Clear the session data
+    request.session.flush()
+    logout(request)
+    messages.success(request, 'Successfully logged out!')
+    return redirect('home_customer')
+
+def logout_view_owner(request):
     # Clear the session data
     request.session.flush()
     logout(request)
