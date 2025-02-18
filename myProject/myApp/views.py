@@ -180,6 +180,11 @@ def home_owner(request):
     username = request.session.get('username')  # Default to 'Guest' if no session data
     return render(request, 'myApp/home_owner.html', {'username': username})
 
+def category_services(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
+    services = category.services.all()  # Assuming a ForeignKey or ManyToMany relationship
+    return render(request, 'myApp/category_services.html', {'category': category, 'services': services})
+
 # Service List
 @login_required
 def manage_services(request):

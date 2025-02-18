@@ -5,29 +5,13 @@
 {% block content %}
 {% load static %}
 <style>
-    .nearby-salons {
+.nearby-salons {
     padding: 20px;
     max-width: 1200px;
-    margin: left;   
+    margin: 0 auto; /* Centering the container */
 }
 
-.book-appointment {
-    display: inline-block;
-    background-color: #000000;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
-    text-decoration: none;
-    text-align: center;
-    margin-top: 10px;
-}
-
-.book-appointment:hover {
-    background-color: #000000;
-}
-
-/* Container for Services Section */
+/* Services Section */
 .services {
     padding: 20px;
     max-width: 1200px;
@@ -36,8 +20,8 @@
 
 /* Service Grid Layout */
 .service-grid {
-    display: flex;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Uniform grid layout */
     gap: 20px;
     padding: 20px;
 }
@@ -53,10 +37,12 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    width: 750px;
-    height: 400px;
+    text-align: center;
+    overflow: hidden;
+    min-height: 400px; /* Uniform height */
 }
 
+/* Hover Effect */
 .service-item:hover {
     transform: scale(1.05);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
@@ -64,17 +50,42 @@
 
 /* Service Image Styling */
 .service-image {
-    width: 100%;
-    height: 250px; /* Fixed height to ensure consistency */
-    object-fit: cover;
+    width: 100%; /* Full width */
+    height: 250px; /* Fixed height for uniformity */
+    object-fit: cover; /* Ensures images fit properly without distortion */
     border-radius: 8px;
-    margin-bottom: 15px;
+    padding: 10px; /* Added padding for better spacing */
 }
 
-/* Responsive Design for Smaller Screens */
+/* Service Text Styling */
+.service-item h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Button Styling */
+.book-appointment {
+    display: inline-block;
+    background-color: #000000;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    text-align: center;
+    margin-top: auto; /* Pushes the button to the bottom */
+}
+
+.book-appointment:hover {
+    background-color: #333333;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
     .service-grid {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Adjust for tablet screens */
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjust for tablet screens */
+        gap: 15px;
     }
 }
 
@@ -92,7 +103,7 @@
         <div class="service-grid">
             {% for service in services %}
                 <div class="service-item">
-                    <img src="{% static 'images/'|add:service.image_name %}" alt="{{ service.name }}" class="service-image">
+                    <img src="{{ service.image.url }}" alt="{{ service.name }}" class="service-image">
                     <h3>{{ service.name }}</h3>
                     <a href="{% url 'service_detail' service.id %}" class="book-appointment">
                         Book Service

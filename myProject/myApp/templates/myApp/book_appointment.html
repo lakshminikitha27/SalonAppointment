@@ -149,7 +149,7 @@ button.slot[disabled] {
 
 <div class="book_container">
     <div class="book_header">
-        <img src="{% static 'images/'|add:salon.image_name %}" alt="{{ salon.name }}">
+        <img src="{{ salon.image.url }}" alt="{{ salon.name }}">
         <div class="book_details">
             <div class="salon-name">{{ salon.name }}</div>
             <div class="appointment-details">
@@ -197,15 +197,20 @@ button.slot[disabled] {
     <script>
         function updateDate() {
     const dateInput = document.getElementById("appointment-date").value;
-    
-    if (!dateInput) return;
+    const selectedDateSpan = document.getElementById("selected-date");
+
+    if (dateInput) {
+        selectedDateSpan.textContent = "Date: " + dateInput;
+    } else {
+        selectedDateSpan.textContent = "Date: Not selected";
+    }
 
     const selectedDate = new Date(dateInput);
     const today = new Date();
-    
+
     if (selectedDate.toDateString() === today.toDateString()) {
         const currentTime = today.getHours() * 60 + today.getMinutes(); // Get time in minutes
-        
+
         document.querySelectorAll(".slot").forEach(slot => {
             const [hours, minutes] = slot.getAttribute("data-slot").split(":").map(Number);
             const slotTime = hours * 60 + minutes;  // Convert slot to minutes
@@ -213,11 +218,12 @@ button.slot[disabled] {
             if (slotTime < currentTime) {
                 slot.classList.add("filled");
                 slot.disabled = true;
-                slot.textContent += " (Passed)";
+                slot.textContent = slot.textContent.split(" (")[0] + " (Passed)";
             }
         });
     }
 }
+
 
 // Hide past time slots when selecting today
 document.addEventListener("DOMContentLoaded", function () {

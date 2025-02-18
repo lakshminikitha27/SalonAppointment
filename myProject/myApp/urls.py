@@ -20,6 +20,7 @@ urlpatterns = [
     path('services/', views.all_services, name='all_services'), 
     path('categories/', views.all_categories, name='all_categories'), 
     path('services/', views.service_detail, name='Services'),
+    path('categories/<int:category_id>/services/', views.category_services, name='category_services'),
     path('profile_customer/', views.profile_view, name='profile_view'),
     path('edit_profile/', views.edit_profile, name='edit_profile'), 
     path('profile_customer/edit_customer/', views.edit_profile, name='edit_profile_customer'), 

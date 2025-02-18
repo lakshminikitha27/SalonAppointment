@@ -114,7 +114,7 @@
         }
 </style>
     <div class="salon-container">
-        <img src="{% static 'images/'|add:salon.image_name %}" alt="{{ salon.name }}" class="salon-image">
+        <img src="{{ salon.image.url }}" alt="{{ salon.name }}" class="salon-image">
         <div class="salon-details">
             <h1 class="salon-name">{{ salon.name }}</h1>
             <br>
@@ -133,7 +133,7 @@
         <ul>
             {% for service in services %}
             <li class="service-item">
-                <img src="{% static 'images/'|add:service.image_name %}" alt="{{ service.name }}" class="service-image">
+                <img src="{{ service.image.url }}" alt="{{ service.name }}" class="service-image">
                 <div class="service-details">
                     <h3 class="service-name">{{ service.name }} - {{ service.price }} INR</h3>
                     <p class="service-duration">Duration: {{ service.duration }} minutes</p>

@@ -175,15 +175,9 @@
                 <div class="service-item">
                     <img src="{{ category.image.url }}" alt="{{ category.name }}" class="service-image">
                     <h3>{{ category.name }}</h3>
-                    <div>
-                        {% for service in category.services.all %}
-                            <div>
-                                <img src="{{ service.image.url }}" alt="{{ service.name }}" width="50">
-                                <p>{{ service.name }} - ${{ service.price }}</p>
-                                <a href="{% url 'service_detail' service.id %}">View Details</a>
-                            </div>
-                        {% endfor %}
-                    </div>
+                    <a href="{% url 'category_services' category_id=category.id %}" class="book-appointment">
+                        View Services
+                    </a>
                 </div>
             {% endfor %}
         </div>

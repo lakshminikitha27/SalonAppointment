@@ -28,7 +28,10 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    width: 750px;
+    width: 100%; /* Adjusted for responsiveness */
+    max-width: 400px; /* Set max width */
+    text-align: center;
+    overflow: hidden;
 }
 
 .salon-item:hover {
@@ -37,11 +40,10 @@
 }
 
 .salon-image {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
+    width: 100%; /* Ensures full width */
+    height: 250px; /* Uniform height */
+    object-fit: cover; /* Ensures the image fills the area without distortion */
     border-radius: 8px;
-    margin-bottom: 15px;
 }
 
 /* Text Styling */
@@ -103,12 +105,13 @@
                 <img src="{{ category.image.url }}" alt="{{ category.name }}" class="salon-image">
                 <h3>{{ category.name }}</h3>
 
-                <a href="{% url 'service_detail' service_id=service.id %}" class="book-appointment">
+                <a href="{% url 'category_services' category_id=category.id %}" class="book-appointment">
                     View Services
                 </a>
             </div>
         {% endfor %}
     </div>
 </section>
+
 
 {% endblock %}
