@@ -1,5 +1,6 @@
 # myApp/views.py
 from django.shortcuts import render, redirect
+from django.conf import settings
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from .forms import UserDetailsForm, OwnerDetailsForm, StaffForm, ServiceForm
@@ -137,40 +138,42 @@ def home_customer(request):
     user_lon = request.GET.get('lon')
 
     if not user_lat or not user_lon:
-        return render(request, 'myApp/home_customer.html', {'nearby_salons': []})  # No user location data
+        return render(request, 'myApp/home_customer.html', {'nearby_salons': [], 'categories': []})
 
     try:
         user_lat, user_lon = float(user_lat), float(user_lon)
     except ValueError:
-        return render(request, 'myApp/home_customer.html', {'nearby_salons': []})
+        return render(request, 'myApp/home_customer.html', {'nearby_salons': [], 'categories': []})
 
-    salons = Salon.objects.values('id', 'name', 'rating', 'image_name', 'address', 'latitude', 'longitude')
-    print(f"Found {len(salons)} salons.")  # Fetch addresses
-    if not salons:
-        print(f"No salons found in the database.")
+    salons = Salon.objects.values('id', 'name', 'rating', 'image', 'address', 'latitude', 'longitude')
 
     nearby_salons = []
     for salon in salons:
-        address = salon["address"]
         lat = salon.get("latitude")
         lon = salon.get("longitude")
-
-        if lat is None or lon is None:  # If lat/lon is missing, fetch it
-            lat, lon = get_lat_lon_from_address(address)
+        if lat is None or lon is None:
+            lat, lon = get_lat_lon_from_address(salon["address"])
             if lat and lon:
                 salon["latitude"] = lat
                 salon["longitude"] = lon
             else:
-                continue  # Skip this salon if we cannot get the location
+                continue  
 
         distance = calculate_distance(user_lat, user_lon, lat, lon)
         salon['distance'] = round(distance, 2)
+        salon['image_url'] = salon['image'] and salon['image'] or ''
         nearby_salons.append(salon)
+    print(nearby_salons)
 
-    nearby_salons = sorted(nearby_salons, key=lambda x: x['distance'])[:3]  # Limit to 3 nearest salons
-    services = Service.objects.all()
+    nearby_salons = sorted(nearby_salons, key=lambda x: x['distance'])[:3]
 
-    return render(request, 'myApp/home_customer.html', {'nearby_salons': nearby_salons, 'services': services})
+    categories = Category.objects.prefetch_related("services").all()  # Fetch categories with services
+
+    return render(request, 'myApp/home_customer.html', {
+        'nearby_salons': nearby_salons,
+        'categories': categories,
+        'MEDIA_URL': settings.MEDIA_URL
+    })
 
 # Home Page
 def home_owner(request):
@@ -276,19 +279,14 @@ def select_salon_service(request, salon_id, service_id):
     return redirect('book_appointment')
 
 def service_detail(request, service_id):
-    service = get_object_or_404(Service, id=service_id)  # Retrieves the service or returns a 404 error if not found
-    salons = service.salons.all().distinct()  # Get salons offering this service
+    service = get_object_or_404(Service.objects.select_related("category"), id=service_id)
+    salons = service.salons.all().distinct()
 
-    context = {
-        'title': f"Salons Offering {service.name}",
+    return render(request, 'myApp/service.html', {
+        'service': service,
         'salons': salons,
-    }
-    return render(request, 'myApp/service.html', context)
-
-
-def profile(request):
-    # Logic to handle the profile page
-    return render(request, 'myApp/profile.html')
+        'category': service.category
+    })
 
 
 from django.db.utils import IntegrityError
@@ -603,6 +601,11 @@ def add_category(request):
     categories = Category.objects.all()
     return render(request, 'myApp/add_category.html', {'categories': categories})
 
+def all_categories(request):
+    # Fetch all salons, you can use pagination if needed
+    categories = Category.objects.all()
+
+    return render(request, 'myApp/categories.html', {'categories': categories})
 
 def all_salons(request):
     # Fetch all salons, you can use pagination if needed

@@ -18,6 +18,7 @@ urlpatterns = [
     path('search/', views.search, name='search'),
     path('salons/', views.all_salons, name='all_salons'),
     path('services/', views.all_services, name='all_services'), 
+    path('categories/', views.all_categories, name='all_categories'), 
     path('services/', views.service_detail, name='Services'),
     path('profile_customer/', views.profile_view, name='profile_view'),
     path('edit_profile/', views.edit_profile, name='edit_profile'), 
@@ -57,4 +58,8 @@ urlpatterns = [
     path('manage_services/', views.manage_services, name='manage_services'),
     #path('delete_category/<int:category_id>/', views.delete_category, name='delete_category'),
     path('delete_service/<int:service_id>/', views.delete_service, name='delete_service'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] 
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -154,7 +154,7 @@
         <div class="salon-grid">
             {% for salon in nearby_salons %}
             <div class="salon-item">
-                <img src="{% static 'images/'|add:salon.image_name %}" alt="{{ salon.name }}" class="salon-image">
+                <img src="{{ MEDIA_URL }}{{ salon.image_url }}" alt="{{ salon.name }}" class="salon-image">
                 <h3>{{ salon.name }}</h3>
                 <p>Rating: {{ salon.rating }}</p>
                 <p>Distance: {{ salon.distance }} km</p> 
@@ -171,13 +171,19 @@
     <section class="nearby-salons">
         <h2>Our Services</h2>
         <div class="service-grid">
-            {% for service in services %}
+            {% for category in categories %}
                 <div class="service-item">
-                    <img src="{% static 'images/'|add:service.image_name %}" alt="{{ service.name }}" class="service-image">
-                    <h3>{{ service.name }}</h3>
-                    <a href="{% url 'service_detail' service.id %}" class="book-appointment">
-                        Book Service
-                    </a>
+                    <img src="{{ category.image.url }}" alt="{{ category.name }}" class="service-image">
+                    <h3>{{ category.name }}</h3>
+                    <div>
+                        {% for service in category.services.all %}
+                            <div>
+                                <img src="{{ service.image.url }}" alt="{{ service.name }}" width="50">
+                                <p>{{ service.name }} - ${{ service.price }}</p>
+                                <a href="{% url 'service_detail' service.id %}">View Details</a>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
             {% endfor %}
         </div>

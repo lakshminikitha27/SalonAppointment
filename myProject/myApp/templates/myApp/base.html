@@ -45,6 +45,7 @@
                 <li><a href="{% url 'home_customer' %}">Home</a></li>
                 <li><a href="{% url 'all_services' %}">Services</a></li>
                 <li><a href="{% url 'all_salons' %}">Salons</a></li>
+                <li><a href="{% url 'all_categories' %}">Categories</a></li>
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'profile_view' %}">Hello, {{ user.username }}</a></li>
                     <li><a href="{% url 'logout_view_customer' %}">Logout</a></li>

@@ -1,6 +1,6 @@
 {% extends "myApp/base.html" %}
 
-{% block title %}Salons - SS ENTERPRISES{% endblock %}
+{% block title %}Categories - SS ENTERPRISES{% endblock %}
 
 {% block content %}
 {% load static %}
@@ -96,16 +96,15 @@
 
 </style>
 <section class="salons">
-    <h2>All Salons</h2>
+    <h2>All Categories</h2>
     <div class="salon-grid">
-        {% for salon in salons %}
+        {% for category in categories %}
             <div class="salon-item">
-                <img src="{{ salon.image.url }}" alt="{{ salon.name }}" class="salon-image">
-                <h3>{{ salon.name }}</h3>
-                <p>Rating: {{ salon.rating }}</p>
+                <img src="{{ category.image.url }}" alt="{{ category.name }}" class="salon-image">
+                <h3>{{ category.name }}</h3>
 
-                <a href="{% url 'salon_details' salon_id=salon.id %}" class="book-appointment">
-                    Explore Salon
+                <a href="{% url 'service_detail' service_id=service.id %}" class="book-appointment">
+                    View Services
                 </a>
             </div>
         {% endfor %}

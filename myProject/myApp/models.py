@@ -41,11 +41,19 @@ class OwnerDetails(AbstractUser):
     def _str_(self):
         return self.username
 
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    image = models.ImageField(upload_to='categories/', null=True, blank=True)
+
+    def _str_(self):
+        return self.name
+
 class Service(models.Model):
     name = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image_name = models.CharField(max_length=100,default='service1.jpg')
+    image = models.ImageField(upload_to='services/', null=True, blank=True)
     duration = models.PositiveIntegerField(default=30,help_text="Duration in minutes")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="services", null=True)  # Added category
 
     def __str__(self):
         return self.name
@@ -65,7 +73,7 @@ class Salon(models.Model):
     address = models.TextField()
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
-    image_name = models.CharField(max_length=100,default='salon1.jpg')
+    image = models.ImageField(upload_to='salons/', null=True, blank=True)  # Changed from CharField
     rating = models.FloatField(default=0.0)
     services = models.ManyToManyField(Service, related_name='salons')
 
@@ -120,10 +128,3 @@ class ServiceFeedback(models.Model):
 
     def _str_(self):
         return f"Feedback for Service ID {self.service.id} - Rating: {self.rating}"
-
-class Category(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    image = models.ImageField(upload_to='categories/', null=True, blank=True)
-
-    def _str_(self):
-        return self.name
