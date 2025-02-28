@@ -94,9 +94,14 @@ def login_view_owner(request):
 
         try:
             owner = OwnerDetails.objects.get(username=username)  # Fetch owner by username
+            
             if check_password(password, owner.password):  # Check hashed password
                 request.session['owner_id'] = owner.id  # Store owner ID in session
+                request.session['is_authenticated'] = True  # Custom session flag
+                request.session['owner_username'] = owner.username  # Store username
                 messages.success(request, 'Successfully logged in as Owner!')
+
+                print(f"Session Data After Login: {request.session.items()}")  # Debugging
                 return redirect('home_owner')  # Redirect to owner's dashboard
             else:
                 messages.error(request, 'Invalid username or password')
@@ -255,7 +260,7 @@ def delete_service(request, pk):
 def service_list(request):
     if 'username' not in request.session:
         messages.error(request, 'Your session has expired. Please log in again.')
-        return redirect('login')
+        return redirect('login_view_owner')
 
     services = Service.objects.all()
     return render(request, 'myApp/service_list.html', {
@@ -627,9 +632,17 @@ def all_services(request):
 # User Profile
 @login_required
 def profile_owner(request):
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(UserDetails, id=user_id)
-    return render(request, 'myApp/profile.html', {'user': user, 'username': request.session.get('username'),})
+    owner_id = request.session.get('owner_id')  # Fetch owner_id from session
+    if owner_id:
+        try:
+            owner = OwnerDetails.objects.get(id=owner_id)
+            return render(request, 'myApp/profile_owner.html', {'owner': owner})  # Pass owner instead of user
+        except OwnerDetails.DoesNotExist:
+            messages.error(request, "Owner profile not found!")
+            return redirect('login_view_owner')
+    else:
+        messages.error(request, "Please log in first.")
+        return redirect('login_view_owner')
 
 
 # Edit Profile
@@ -641,10 +654,10 @@ def edit_profile_owner(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Profile updated successfully!")
-            return redirect('profile')
+            return redirect('profile_owner')
     else:
         form = UserDetailsForm(instance=user)
-    return render(request, 'myApp/edit_profile.html', {'form': form})
+    return render(request, 'myApp/edit_profile_owner.html', {'form': form})
 
 
 @login_required

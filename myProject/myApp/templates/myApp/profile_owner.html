@@ -1,4 +1,4 @@
-{% extends 'base1.html' %}
+{% extends 'myApp/base1.html' %}
 {% block content %}
     <style>
         body {
@@ -120,54 +120,53 @@
         <div class="user-details">
             <div>
                 <strong>Username:</strong>
-                <span>{{ user.username }}</span>
+                <span>{{ owner.username }}</span>
             </div>
             <div>
                 <strong>First Name:</strong>
-                <span>{{ user.first_name }}</span>
+                <span>{{ owner.first_name }}</span>
             </div>
             <div>
                 <strong>Last Name:</strong>
-                <span>{{ user.last_name }}</span>
+                <span>{{ owner.last_name }}</span>
             </div>
             <div>
                 <strong>Email:</strong>
-                <span>{{ user.email }}</span>
+                <span>{{ owner.email }}</span>
             </div>
             <div>
                 <strong>Salon Name:</strong>
-                <span>{{ user.salon_name }}</span>
+                <span>{{ owner.salon_name }}</span>
             </div>
             <div>
                 <strong>Phone Number:</strong>
-                <span>{{ user.phone }}</span>
+                <span>{{ owner.phone }}</span>
             </div>
             <div>
                 <strong>Address:</strong>
-                <span>{{ user.address }}</span>
+                <span>{{ owner.address }}</span>
             </div>
             <div>
                 <strong>City:</strong>
-                <span>{{ user.city }}</span>
+                <span>{{ owner.city }}</span>
             </div>
             <div>
                 <strong>State:</strong>
-                <span>{{ user.state }}</span>
+                <span>{{ owner.state }}</span>
             </div>
             <div>
                 <strong>Pin Code:</strong>
-                <span>{{ user.pin_code }}</span>
+                <span>{{ owner.pin_code }}</span>
             </div>
             <div>
                 <strong>Country:</strong>
-                <span>{{ user.country }}</span>
+                <span>{{ owner.country }}</span>
             </div>
         </div>
 
         <div class="btn-container">
-            <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
-            <a href="{% url 'change_password' %}" class="btn btn-secondary">Change Password</a>
-            <a href="{% url 'home' %}" class="btn btn-primary">Back to Dashboard</a>
+            <a href="{% url 'edit_profile_owner' %}" class="btn btn-primary">Edit Profile</a>
+            <a href="{% url 'home_owner' %}" class="btn btn-primary">Back to Dashboard</a>
         </div>
     </section>
 {% endblock %}

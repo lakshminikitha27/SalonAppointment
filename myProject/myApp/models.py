@@ -2,9 +2,13 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.contrib.auth.models import User
 
 
-class UserDetails(AbstractUser):  # Inherit from AbstractUser, not models.Model
+class UserDetails(AbstractUser):# Inherit from AbstractUser, not models.Model
+    last_login=None
+    is_superuser=None
+    is_staff=None
     phone = models.CharField(max_length=15)
     first_name=models.CharField(max_length=30)
     last_name=models.CharField(max_length=15)
@@ -27,6 +31,9 @@ class UserDetails(AbstractUser):  # Inherit from AbstractUser, not models.Model
         return self.username  # Or you could return something more descriptive, e.g. self.email
 
 class OwnerDetails(AbstractUser):
+    last_login=None
+    is_superuser=None
+    is_staff=None
     salon_name = models.CharField(max_length=100, blank=True)
     phone = models.CharField(max_length=15, blank=True)
     gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')], blank=True)

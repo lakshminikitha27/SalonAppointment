@@ -124,10 +124,10 @@
             <li><a href="/">Home</a></li>
             <li><a href="{% url 'service_list' %}">Service</a></li>
             <li><a href="{% url 'staff_list' %}">Staff</a></li>
-          
-            {% if user.is_authenticated %}
-                <li><a href="{% url 'profile_owner' %}">Hello, {{ username }}</a></li>
-                <li><a href="{% url 'logout' %}">Logout</a></li>
+        
+            {% if request.session.is_authenticated %}
+                <li><a href="{% url 'profile_owner' %}">Hello, {{ request.session.owner_username }}</a></li>
+                <li><a href="{% url 'logout_view_owner' %}">Logout</a></li>
             {% else %}
                 <li><a href="{% url 'login_view_owner' %}">Login</a></li>
                 <li><a href="{% url 'register_owner' %}">Signup</a></li>

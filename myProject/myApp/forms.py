@@ -39,8 +39,6 @@ class StaffForm(forms.ModelForm):
         model = Staff
         fields = ['name', 'position', 'email', 'phone', 'photo']
 
-
-
 #class AppointmentForm(forms.ModelForm):
 #    class Meta:
         # model = Appointment

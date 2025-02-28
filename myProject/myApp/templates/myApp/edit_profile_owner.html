@@ -103,7 +103,7 @@
         <div class="form-box">
             <h2 class="title">Edit Your Profile</h2>
             
-            <form method="POST" action="{% url 'edit_profile' %}">
+            <form method="POST" action="{% url 'edit_profile_owner' %}">
                 {% csrf_token %}
                 
                 <div class="input-box">
@@ -165,7 +165,7 @@
             </form>
 
             <div class="linkTxt">
-                <a href="{% url 'profile' %}">Back to Profile</a>
+                <a href="{% url 'profile_owner' %}">Back to Profile</a>
             </div>
         </div>
     </div>
